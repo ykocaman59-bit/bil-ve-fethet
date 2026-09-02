@@ -15,7 +15,8 @@ const playerScores = { 1: 1000, 2: 1000, 3: 1000, 4: 1000 };
 // Soruları JSON'dan yükle
 fetch('questions.json')
   .then(res => res.json())
-  .then(data => { questions = data; });
+  .then(data => { questions = data; })
+  .catch(err => console.error("Soru yükleme hatası:", err));
 
 function selectRegion(regionId) {
   selectedRegionId = regionId;
@@ -23,7 +24,10 @@ function selectRegion(regionId) {
 }
 
 function openQuestionModal() {
-  if (questions.length === 0) return;
+  if (questions.length === 0) {
+    alert("Sorular henüz yüklenmedi veya questions.json dosyası eksik!");
+    return;
+  }
   
   // Rastgele soru seç
   const randomIndex = Math.floor(Math.random() * questions.length);
@@ -41,7 +45,7 @@ function openQuestionModal() {
     optionsContainer.appendChild(btn);
   });
 
-  document.getElementById('question-modal').style.styleDisplay = 'flex';
+  // Modal penceresini aç
   document.getElementById('question-modal').style.display = 'flex';
 }
 
@@ -53,7 +57,9 @@ function handleAnswer(selectedIndex) {
     
     // Bölgenin rengini değiştiren fetih mekaniği
     const regionObj = document.getElementById(`region-${selectedRegionId}`);
-    regionObj.setAttribute('fill', playerColors[activePlayer]);
+    if (regionObj) {
+      regionObj.setAttribute('fill', playerColors[activePlayer]);
+    }
     
     // Puan Güncelle
     playerScores[activePlayer] += 400;
@@ -65,4 +71,3 @@ function handleAnswer(selectedIndex) {
   // Sıradaki oyuncuya geç (1 -> 2 -> 3 -> 4 -> 1)
   activePlayer = (activePlayer % 4) + 1;
 }
-

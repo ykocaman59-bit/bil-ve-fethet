@@ -4,60 +4,245 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Bil ve Fethet - Tam Sürüm</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #2b1a0e;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 10px;
+    }
+
+    /* Üst Oyuncu Paneli */
+    .scoreboard {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 10px;
+    }
+
+    .player-card {
+      background: #422917;
+      border: 2px solid #6e472a;
+      border-radius: 8px;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.75rem;
+      text-align: center;
+    }
+
+    .player-card.active {
+      border-color: #ffd700;
+      box-shadow: 0 0 10px #ffd700;
+      background: #57361e;
+    }
+
+    .p1 { color: #ff4d4d; }
+    .p2 { color: #2ecc71; }
+    .p3 { color: #3498db; }
+    .p4 { color: #9b59b6; }
+
+    .p-score {
+      font-weight: bold;
+      color: #fff;
+      font-size: 0.85rem;
+      margin-top: 2px;
+    }
+
+    #game-status {
+      background: #5c3a1e;
+      border: 2px solid #8b5a2b;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin-bottom: 10px;
+      text-align: center;
+      color: #ffd700;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    /* Harita Alanı */
+    .map-wrapper {
+      width: 100%;
+      max-width: 600px;
+      background: #8b5a2b;
+      padding: 10px;
+      border-radius: 12px;
+      border: 4px solid #422917;
+    }
+
+    .map-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .region {
+      background: #d4a76a;
+      border: 2px solid #5c3a1e;
+      border-radius: 8px;
+      height: 85px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #2b1a0e;
+      font-weight: bold;
+      font-size: 0.8rem;
+      position: relative;
+      text-align: center;
+      padding: 4px;
+    }
+
+    .region.owner-1 { background: #e74c3c; color: #fff; }
+    .region.owner-2 { background: #2ecc71; color: #fff; }
+    .region.owner-3 { background: #3498db; color: #fff; }
+    .region.owner-4 { background: #9b59b6; color: #fff; }
+
+    .region.capital {
+      border: 3px solid #ffd700;
+      box-shadow: inset 0 0 8px rgba(255, 215, 0, 0.6);
+    }
+
+    .region .badge {
+      font-size: 0.7rem;
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 10px;
+      margin-top: 4px;
+    }
+
+    /* Modal Soru Ekranı */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      padding: 15px;
+    }
+
+    .modal-content {
+      background: #f4e4bc;
+      color: #2b1a0e;
+      border: 4px solid #5c3a1e;
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 450px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .modal-header {
+      font-weight: bold;
+      color: #8b5a2b;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+    }
+
+    .question-body {
+      font-size: 1rem;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .opt-btn {
+      background: #5c3a1e;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .numeric-container {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .numeric-container input {
+      padding: 10px;
+      font-size: 1rem;
+      text-align: center;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .numeric-container button {
+      padding: 10px;
+      background: #2ecc71;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Üst Oyuncu Bilgi Paneli -->
+  <!-- Oyuncu Bilgi Paneli -->
   <header class="scoreboard">
     <div id="p1-card" class="player-card p1">
-      <div class="avatar">👑</div>
-      <div class="details">
-        <span class="p-name">Kırmızı</span>
-        <span id="p1-score" class="p-score">0 P</span>
-      </div>
+      <span class="p-name">👑 Kırmızı</span>
+      <span id="p1-score" class="p-score">0 P</span>
     </div>
     <div id="p2-card" class="player-card p2">
-      <div class="avatar">👑</div>
-      <div class="details">
-        <span class="p-name">Yeşil</span>
-        <span id="p2-score" class="p-score">0 P</span>
-      </div>
+      <span class="p-name">👑 Yeşil</span>
+      <span id="p2-score" class="p-score">0 P</span>
     </div>
     <div id="p3-card" class="player-card p3">
-      <div class="avatar">👑</div>
-      <div class="details">
-        <span class="p-name">Mavi</span>
-        <span id="p3-score" class="p-score">0 P</span>
-      </div>
+      <span class="p-name">👑 Mavi</span>
+      <span id="p3-score" class="p-score">0 P</span>
     </div>
     <div id="p4-card" class="player-card p4">
-      <div class="avatar">👑</div>
-      <div class="details">
-        <span class="p-name">Mor</span>
-        <span id="p4-score" class="p-score">0 P</span>
-      </div>
+      <span class="p-name">👑 Mor</span>
+      <span id="p4-score" class="p-score">0 P</span>
     </div>
   </header>
 
-  <!-- Durum ve Aşama Bilgilendirme -->
   <div id="game-status">Oyun Başlatılıyor...</div>
 
-  <!-- Türkiye Haritası Arenası -->
   <main class="map-wrapper">
     <div class="map-container" id="mapGrid"></div>
   </main>
 
-  <!-- Soru Penceresi (Modal) -->
+  <!-- Modal -->
   <div class="modal" id="questionModal">
     <div class="modal-content">
       <div class="modal-header" id="modalHeader">SORU</div>
       <div class="question-body" id="questionText">Soru metni...</div>
       
-      <!-- Çoktan Seçmeli Seçenekler -->
       <div class="options-grid" id="multipleChoiceContainer"></div>
 
-      <!-- Sayısal Tahmin Alanı -->
       <div class="numeric-container" id="numericContainer">
         <input type="number" id="numericInput" placeholder="Tahmininizi girin">
         <button id="submitNumericBtn">Gönder</button>
@@ -65,8 +250,226 @@
     </div>
   </div>
 
-  <script src="questions.js"></script>
-  <script src="app.js"></script>
+  <script>
+    const multipleChoiceQuestions = [
+      { q: "Bizans İmparatorluğu'nun başkenti neresiydi?", options: ["Ankara", "İstanbul", "Atina", "Roma"], answer: 1 },
+      { q: "Fatih Sultan Mehmet İstanbul'u kaç yılında fethetti?", options: ["1071", "1299", "1453", "1923"], answer: 2 },
+      { q: "İstiklal Marşı'mızın şairi kimdir?", options: ["Mehmet Akif Ersoy", "Yahya Kemal", "Namık Kemal", "Ziya Gökalp"], answer: 0 },
+      { q: "Dünyanın en büyük okyanusu hangisidir?", options: ["Atlas Okyanusu", "Hint Okyanusu", "Büyük Okyanus", "Arktik Okyanusu"], answer: 2 },
+      { q: "Türkiye'nin yüzölçümü en büyük ili hangisidir?", options: ["Ankara", "Konya", "Sivas", "Erzurum"], answer: 1 }
+    ];
+
+    const numericQuestions = [
+      { q: "Cumhuriyet kaç yılında ilan edilmiştir?", answer: 1923 },
+      { q: "İstanbul kaç yılında fethedilmiştir?", answer: 1453 },
+      { q: "Malazgirt Meydan Muharebesi hangi yılda gerçekleşmiştir?", answer: 1071 },
+      { q: "Türkiye'nin toplam il sayısı kaçtır?", answer: 81 },
+      { q: "TBMM kaç yılında açılmıştır?", answer: 1920 }
+    ];
+
+    const STAGES = { CAPITAL_SELECT: 1, NUMERIC_DISTRIBUTION: 2, ATTACK_PHASE: 3 };
+    let currentStage = STAGES.CAPITAL_SELECT;
+
+    const players = [
+      { id: 1, name: "Kırmızı", score: 0, capitalId: null },
+      { id: 2, name: "Yeşil", score: 0, capitalId: null },
+      { id: 3, name: "Mavi", score: 0, capitalId: null },
+      { id: 4, name: "Mor", score: 0, capitalId: null }
+    ];
+
+    let activePlayerIdx = 0;
+    let targetRegionIdx = null;
+
+    const regions = [
+      { id: 1, name: "Marmara", owner: null, isCapital: false, hp: 1, value: 200 },
+      { id: 2, name: "Ege", owner: null, isCapital: false, hp: 1, value: 200 },
+      { id: 3, name: "Akdeniz", owner: null, isCapital: false, hp: 1, value: 200 },
+      { id: 4, name: "İç Anadolu", owner: null, isCapital: false, hp: 1, value: 200 },
+      { id: 5, name: "Karadeniz", owner: null, isCapital: false, hp: 1, value: 200 },
+      { id: 6, name: "Doğu Anadolu", owner: null, isCapital: false, hp: 1, value: 200 },
+      { id: 7, name: "Güneydoğu", owner: null, isCapital: false, hp: 1, value: 200 },
+      { id: 8, name: "Trakya", owner: null, isCapital: false, hp: 1, value: 200 },
+      { id: 9, name: "Kafkas", owner: null, isCapital: false, hp: 1, value: 200 }
+    ];
+
+    function initGame() {
+      renderMap();
+      updateStatus(`${players[activePlayerIdx].name} - Ana Kaleni Seç! (1000 Puan)`);
+    }
+
+    function updateStatus(msg) {
+      document.getElementById("game-status").innerText = msg;
+    }
+
+    function renderMap() {
+      const mapEl = document.getElementById("mapGrid");
+      mapEl.innerHTML = "";
+
+      regions.forEach((reg, idx) => {
+        const div = document.createElement("div");
+        div.className = `region ${reg.owner ? 'owner-' + reg.owner : ''} ${reg.isCapital ? 'capital' : ''}`;
+        
+        let icon = reg.isCapital ? "🏰" : "🛡️";
+        let ownerText = reg.owner ? players.find(p => p.id === reg.owner).name : "Boş";
+
+        div.innerHTML = `
+          <div>${icon} ${reg.name}</div>
+          <div class="badge">${reg.value} P</div>
+          <small>${ownerText}</small>
+        `;
+
+        div.onclick = () => handleRegionClick(idx);
+        mapEl.appendChild(div);
+      });
+
+      updateScoreboard();
+    }
+
+    function updateScoreboard() {
+      players.forEach(p => {
+        document.getElementById(`p${p.id}-score`).innerText = `${p.score} P`;
+        const card = document.getElementById(`p${p.id}-card`);
+        if (players[activePlayerIdx].id === p.id) {
+          card.classList.add("active");
+        } else {
+          card.classList.remove("active");
+        }
+      });
+    }
+
+    function handleRegionClick(idx) {
+      const reg = regions[idx];
+      const p = players[activePlayerIdx];
+
+      if (currentStage === STAGES.CAPITAL_SELECT) {
+        if (reg.owner !== null) return alert("Bu bölge dolu!");
+        
+        reg.owner = p.id;
+        reg.isCapital = true;
+        reg.value = 1000;
+        reg.hp = 3;
+        p.capitalId = reg.id;
+        p.score += 1000;
+
+        activePlayerIdx++;
+        if (activePlayerIdx >= players.length) {
+          activePlayerIdx = 0;
+          currentStage = STAGES.NUMERIC_DISTRIBUTION;
+          startNumericPhase();
+        } else {
+          updateStatus(`${players[activePlayerIdx].name} - Ana Kaleni Seç! (1000 Puan)`);
+        }
+        renderMap();
+      } 
+      else if (currentStage === STAGES.ATTACK_PHASE) {
+        if (reg.owner === p.id) return alert("Kendi bölgene saldıramazsın!");
+        targetRegionIdx = idx;
+        openMultipleChoiceModal();
+      }
+    }
+
+    function startNumericPhase() {
+      const emptyRegions = regions.filter(r => r.owner === null);
+      if (emptyRegions.length === 0) {
+        currentStage = STAGES.ATTACK_PHASE;
+        updateStatus(`${players[activePlayerIdx].name} - Saldırmak için bir bölge seç!`);
+        return;
+      }
+
+      const q = numericQuestions[Math.floor(Math.random() * numericQuestions.length)];
+      document.getElementById("modalHeader").innerText = "TAHMİN SORUSU (En Yakın Olan Bölgeyi Alır)";
+      document.getElementById("questionText").innerText = q.q;
+      document.getElementById("multipleChoiceContainer").style.display = "none";
+      
+      const numCon = document.getElementById("numericContainer");
+      numCon.style.display = "flex";
+      document.getElementById("questionModal").style.display = "flex";
+
+      document.getElementById("submitNumericBtn").onclick = () => {
+        const val = parseInt(document.getElementById("numericInput").value);
+        if (isNaN(val)) return;
+
+        document.getElementById("questionModal").style.display = "none";
+        document.getElementById("numericInput").value = "";
+
+        const emptyReg = regions.find(r => r.owner === null);
+        if (emptyReg) {
+          emptyReg.owner = players[activePlayerIdx].id;
+          players[activePlayerIdx].score += emptyReg.value;
+        }
+
+        activePlayerIdx = (activePlayerIdx + 1) % players.length;
+        renderMap();
+        startNumericPhase();
+      };
+    }
+
+    function openMultipleChoiceModal() {
+      const q = multipleChoiceQuestions[Math.floor(Math.random() * multipleChoiceQuestions.length)];
+      document.getElementById("modalHeader").innerText = "FETİH SAVAŞI";
+      document.getElementById("questionText").innerText = q.q;
+      document.getElementById("numericContainer").style.display = "none";
+
+      const container = document.getElementById("multipleChoiceContainer");
+      container.style.display = "grid";
+      container.innerHTML = "";
+
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.className = "opt-btn";
+        btn.innerText = opt;
+        btn.onclick = () => resolveAttack(i === q.answer);
+        container.appendChild(btn);
+      });
+
+      document.getElementById("questionModal").style.display = "flex";
+    }
+
+    function resolveAttack(isCorrect) {
+      document.getElementById("questionModal").style.display = "none";
+      const reg = regions[targetRegionIdx];
+      const attacker = players[activePlayerIdx];
+
+      if (isCorrect) {
+        if (reg.isCapital) {
+          reg.hp--;
+          alert(`Doğru cevap! Ana kalenin canı düştü. Kalan Can: ${reg.hp}`);
+          if (reg.hp <= 0) {
+            alert(`EFSANEVİ FETİH! ${reg.name} Ana Kalesi Yıkıldı!`);
+            transferAllLands(reg.owner, attacker.id);
+          }
+        } else {
+          alert(`Tebrikler! ${reg.name} bölgesi fethedildi!`);
+          if (reg.owner) {
+            const defender = players.find(p => p.id === reg.owner);
+            defender.score -= reg.value;
+          }
+          reg.owner = attacker.id;
+          attacker.score += reg.value;
+        }
+      } else {
+        alert("Yanlış cevap! Fetih başarısız oldu.");
+      }
+
+      activePlayerIdx = (activePlayerIdx + 1) % players.length;
+      updateStatus(`${players[activePlayerIdx].name} - Saldırmak için bir bölge seç!`);
+      renderMap();
+    }
+
+    function transferAllLands(fromPlayerId, toPlayerId) {
+      const winner = players.find(p => p.id === toPlayerId);
+      const loser = players.find(p => p.id === fromPlayerId);
+
+      regions.forEach(r => {
+        if (r.owner === fromPlayerId) {
+          r.owner = toPlayerId;
+          winner.score += r.value;
+        }
+      });
+      loser.score = 0;
+    }
+
+    initGame();
+  </script>
 </body>
 </html>
-

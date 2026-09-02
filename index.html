@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Bil ve Fethet - Tam Sürüm</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Üst Oyuncu Bilgi Paneli -->
+  <header class="scoreboard">
+    <div id="p1-card" class="player-card p1">
+      <div class="avatar">👑</div>
+      <div class="details">
+        <span class="p-name">Kırmızı</span>
+        <span id="p1-score" class="p-score">0 P</span>
+      </div>
+    </div>
+    <div id="p2-card" class="player-card p2">
+      <div class="avatar">👑</div>
+      <div class="details">
+        <span class="p-name">Yeşil</span>
+        <span id="p2-score" class="p-score">0 P</span>
+      </div>
+    </div>
+    <div id="p3-card" class="player-card p3">
+      <div class="avatar">👑</div>
+      <div class="details">
+        <span class="p-name">Mavi</span>
+        <span id="p3-score" class="p-score">0 P</span>
+      </div>
+    </div>
+    <div id="p4-card" class="player-card p4">
+      <div class="avatar">👑</div>
+      <div class="details">
+        <span class="p-name">Mor</span>
+        <span id="p4-score" class="p-score">0 P</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Durum ve Aşama Bilgilendirme -->
+  <div id="game-status">Oyun Başlatılıyor...</div>
+
+  <!-- Türkiye Haritası Arenası -->
+  <main class="map-wrapper">
+    <div class="map-container" id="mapGrid"></div>
+  </main>
+
+  <!-- Soru Penceresi (Modal) -->
+  <div class="modal" id="questionModal">
+    <div class="modal-content">
+      <div class="modal-header" id="modalHeader">SORU</div>
+      <div class="question-body" id="questionText">Soru metni...</div>
+      
+      <!-- Çoktan Seçmeli Seçenekler -->
+      <div class="options-grid" id="multipleChoiceContainer"></div>
+
+      <!-- Sayısal Tahmin Alanı -->
+      <div class="numeric-container" id="numericContainer">
+        <input type="number" id="numericInput" placeholder="Tahmininizi girin">
+        <button id="submitNumericBtn">Gönder</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="questions.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+

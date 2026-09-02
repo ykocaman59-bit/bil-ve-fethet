@@ -3,46 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenTrivia Client</title>
+  <title>OpenTrivia - 4 Kişilik Oda Sistemi</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
-    body { background: #121212; color: #fff; padding: 20px; text-align: center; }
-    .card { background: #1e1e1e; max-width: 500px; margin: 20px auto; padding: 20px; border-radius: 8px; }
-    input, button { padding: 10px; margin: 8px 0; width: 100%; border-radius: 4px; border: none; font-size: 16px; }
-    button { background: #6200ee; color: #fff; cursor: pointer; }
-    button:hover { background: #3700b3; }
-    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-    .player-list { text-align: left; margin-top: 10px; }
-    .player-item { display: flex; justify-content: space-between; padding: 8px; background: #2c2c2c; margin-bottom: 4px; border-radius: 4px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    body { background: #0f172a; color: #f8fafc; padding: 20px; text-align: center; }
+    .card { background: #1e293b; max-width: 450px; margin: 15px auto; padding: 20px; border-radius: 12px; border: 1px solid #334155; }
+    button { padding: 14px; margin: 8px 0; width: 100%; border-radius: 8px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    .btn-google { background: #ea4335; color: #fff; }
+    .btn-play { background: #22c55e; color: #fff; }
+    .btn-option { background: #3b82f6; color: #fff; }
+    .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
+    .rank-item { display: flex; justify-content: space-between; padding: 12px; background: #334155; margin-bottom: 6px; border-radius: 6px; }
+    .rank-1 { border-left: 4px solid #f59e0b; }
+    .rank-2 { border-left: 4px solid #94a3b8; }
   </style>
+
+  <!-- Firebase Web SDK (v8) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
-  <h1>OpenTrivia</h1>
+  <h1>TRIVIA ARENA</h1>
 
-  <!-- Lobi Giriş Ekranı -->
-  <div id="join-screen" class="card">
-    <h2>Oyuna Katıl</h2>
-    <input type="text" id="username-input" placeholder="Kullanıcı Adı Girin">
-    <button onclick="joinGame()">Lobiye Katıl</button>
+  <!-- 1. Giriş Ekranı -->
+  <div id="auth-screen" class="card">
+    <h2>Oyuna Başla</h2>
+    <p style="margin: 10px 0; color: #94a3b8;">Sıralamaya girmek için oturum açın</p>
+    <button class="btn-google" onclick="loginWithGoogle()">Google (Gmail) ile Giriş Yap</button>
   </div>
 
-  <!-- Oyun Ekranı -->
+  <!-- 2. Lobi / Eşleşme Ekranı -->
+  <div id="lobby-screen" class="card" style="display: none;">
+    <h3 id="user-display">Hoş geldin!</h3>
+    <button class="btn-play" onclick="findMatch()">🎮 Hızlı Oyuna Gir</button>
+    <div id="match-status" style="margin-top: 10px; color: #e2e8f0;"></div>
+  </div>
+
+  <!-- 3. Oyun Ekranı (4 Kişi Tamamlanınca Açılır) -->
   <div id="game-screen" class="card" style="display: none;">
-    <button onclick="startGame()" id="start-btn">Oyunu Başlat</button>
-    <div id="question-box" style="display: none;">
-      <h3 id="question-text">Soru Yükleniyor...</h3>
-      <div class="options-grid" id="options-container"></div>
-    </div>
+    <div id="room-info" style="font-size: 14px; color: #94a3b8; margin-bottom: 10px;"></div>
+    <h3 id="question-text">Soru Yükleniyor...</h3>
+    <div class="options-grid" id="options-container"></div>
   </div>
 
-  <!-- Skor Ekranı -->
+  <!-- 4. Genel Canlı Sıralama (Leaderboard) -->
   <div class="card">
-    <h3>Canlı Sıralama</h3>
-    <div id="players-container" class="player-list"></div>
+    <h3>🏆 Genel Puan Sıralaması</h3>
+    <div id="leaderboard-container" style="margin-top: 10px;"></div>
   </div>
 
-  <script src="/socket.io/socket.io.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

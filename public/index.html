@@ -8,20 +8,24 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background: #080d1a; color: #fff; user-select: none; overflow-x: hidden; }
 
-    /* --- AÇILIŞ ANİMASYONU (5 SANİYE) --- */
+    /* --- AÇILIŞ ANİMASYONU --- */
     #splash-screen {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: #000; z-index: 9999; display: flex; flex-direction: column;
       justify-content: center; align-items: center; text-align: center;
       animation: fadeOut 1s ease 5s forwards;
     }
-    .splash-img { width: 85%; max-width: 500px; border-radius: 16px; box-shadow: 0 0 35px #f59e0b; animation: zoomIn 2s ease; border: 2px solid #f59e0b; }
-    .splash-title { font-size: 34px; font-weight: 900; color: #f59e0b; margin-top: 25px; text-shadow: 0 0 15px #f59e0b; letter-spacing: 3px; }
+    .splash-card {
+      width: 85%; max-width: 480px; padding: 20px; background: #1e293b;
+      border: 3px solid #f59e0b; border-radius: 16px; box-shadow: 0 0 35px #f59e0b;
+      animation: zoomIn 1.5s ease;
+    }
+    .splash-title { font-size: 32px; font-weight: 900; color: #f59e0b; margin-top: 15px; letter-spacing: 2px; }
 
-    @keyframes zoomIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes zoomIn { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
 
-    /* --- EKRAN DÜZENİ --- */
+    /* --- EKRAN YAPILARI --- */
     .screen { display: none; width: 100%; max-width: 900px; margin: 0 auto; padding: 20px; text-align: center; }
     .screen.active { display: block; }
 
@@ -42,25 +46,32 @@
 
     input { width: 80%; max-width: 300px; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #fff; text-align: center; }
 
-    /* --- LOBİ VE SOHBET --- */
+    /* --- LOBİ & CHAT --- */
     #lobby-layout { display: flex; flex-wrap: wrap; gap: 15px; text-align: left; margin-top: 15px; }
     .lobby-box { flex: 1; min-width: 280px; background: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #334155; }
-    .chat-messages { height: 140px; overflow-y: auto; background: #0f172a; padding: 8px; border-radius: 6px; font-size: 13px; margin-bottom: 8px; }
+    .chat-messages { height: 130px; overflow-y: auto; background: #0f172a; padding: 8px; border-radius: 6px; font-size: 13px; margin-bottom: 8px; }
 
-    #countdown-banner { font-size: 18px; color: #eab308; font-weight: bold; margin-bottom: 10px; display: none; }
+    #countdown-banner { font-size: 16px; color: #eab308; font-weight: bold; margin-bottom: 10px; display: none; }
 
-    /* --- HARİTA VE OYUN --- */
+    /* --- OYUN HARİTASI --- */
     #scoreboard { display: flex; justify-content: space-around; padding: 10px; background: #0f172a; gap: 6px; border-radius: 8px; margin-bottom: 10px; }
     .player-card { flex: 1; padding: 8px; border-radius: 6px; font-weight: bold; font-size: 11px; border: 2px solid rgba(255,255,255,0.15); text-align: center; }
     .player-card.active { border-color: #f59e0b; box-shadow: 0 0 10px #f59e0b; }
 
-    .map-wrapper { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; border: 3px solid #334155; overflow: hidden; background: #0f172a; }
+    .map-container {
+      position: relative; width: 100%; aspect-ratio: 16 / 9;
+      border-radius: 12px; border: 3px solid #334155; background: #1e293b; overflow: hidden;
+    }
+    
     svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-    .region-path { cursor: pointer; transition: 0.2s; }
-    .region-path:hover { filter: brightness(1.3); }
-    .map-text { font-size: 13px; font-weight: 800; fill: #fff; text-anchor: middle; dominant-baseline: central; pointer-events: none; text-shadow: 1px 1px 4px #000; }
-    .unit-icon { font-size: 18px; pointer-events: none; text-anchor: middle; dominant-baseline: central; }
+    .region-path { cursor: pointer; transition: 0.2s; stroke-width: 2; }
+    .region-path:hover { filter: brightness(1.3); stroke: #fff; }
+    .region-path.attackable { animation: pulse 1s infinite alternate; }
+
+    @keyframes pulse { from { stroke: #f59e0b; stroke-width: 3; } to { stroke: #ef4444; stroke-width: 5; } }
+
+    .map-text { font-size: 12px; font-weight: 800; fill: #fff; text-anchor: middle; dominant-baseline: central; pointer-events: none; text-shadow: 1px 1px 3px #000; }
 
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; }
     .modal-box { background: #1e293b; padding: 24px; border-radius: 12px; max-width: 480px; width: 90%; border: 1px solid #475569; text-align: center; }
@@ -70,8 +81,14 @@
 
   <!-- AÇILIŞ ANİMASYONU -->
   <div id="splash-screen">
-    <img src="1000223978_8.png" alt="Fetih Savaşı Haritası" class="splash-img">
-    <div class="splash-title">FETİH SAVAŞI</div>
+    <div class="splash-card">
+      <svg viewBox="0 0 100 100" style="width:120px; height:120px;">
+        <circle cx="50" cy="50" r="45" fill="#0f172a" stroke="#f59e0b" stroke-width="4"/>
+        <path d="M 30 50 L 70 50 M 50 30 L 50 70" stroke="#f59e0b" stroke-width="6" stroke-linecap="round"/>
+        <text x="50" y="55" font-size="28" text-anchor="middle" fill="#fff">⚔️</text>
+      </svg>
+      <div class="splash-title">FETİH SAVAŞI</div>
+    </div>
   </div>
 
   <!-- ANA MENÜ -->
@@ -81,19 +98,19 @@
     <button class="menu-btn" onclick="showScreen('screen-leaderboard')">🏆 Canlı Sıralama</button>
   </div>
 
-  <!-- CANLI SIRALAMA (BOŞ / SIFIRLANMIŞ) -->
+  <!-- CANLI SIRALAMA (BOŞ) -->
   <div id="screen-leaderboard" class="screen">
     <h2>🏆 Canlı Sıralama Tablosu</h2>
     <table class="data-table">
       <thead><tr><th>Sıra</th><th>Oyuncu</th><th>Zaferler</th><th>Puan</th></tr></thead>
-      <tbody id="leaderboard-body">
+      <tbody>
         <tr><td colspan="4" style="color:#94a3b8; padding:20px;">Henüz dereceye giren oyuncu yok. İlk zaferi sen kazan!</td></tr>
       </tbody>
     </table>
     <button class="menu-btn red" onclick="showScreen('screen-main')" style="margin-top:20px;">⬅️ Ana Menüye Dön</button>
   </div>
 
-  <!-- YENİ OYUN MENÜSÜ -->
+  <!-- YENİ OYUN -->
   <div id="screen-newgame" class="screen">
     <h2>🎮 Oyun Modu Seçin</h2>
     <button class="menu-btn green" onclick="quickStart()">⚡ Hızlı Başla (Test Modu)</button>
@@ -143,42 +160,50 @@
     <button class="menu-btn red" onclick="leaveRoom()">🚪 Odadan Çık</button>
   </div>
 
-  <!-- OYUN ALANI -->
+  <!-- SAVAŞ EKRANI -->
   <div id="screen-game" class="screen">
     <div id="scoreboard">
-      <div id="p1" class="player-card active" style="background:#dc2626">1. KUZEY<br><span id="s1">1000</span> P</div>
+      <div id="p1" class="player-card active" style="background:#dc2626">1. KUZEY (Sen)<br><span id="s1">1000</span> P</div>
       <div id="p2" class="player-card" style="background:#2563eb">2. BATI<br><span id="s2">1000</span> P</div>
       <div id="p3" class="player-card" style="background:#16a34a">3. DOĞU<br><span id="s3">1000</span> P</div>
       <div id="p4" class="player-card" style="background:#ca8a04">4. GÜNEY<br><span id="s4">1000</span> P</div>
     </div>
 
-    <div class="map-wrapper">
-      <svg viewBox="0 0 1000 562.5">
-        <image href="1000223978_8.png" x="0" y="0" width="1000" height="562.5" />
-        <!-- Poligon Bölgeleri -->
-        <polygon id="reg-kuzey-kale" class="region-path" points="440,20 560,20 550,120 450,120" onclick="handleRegionClick('kuzey-kale')"/>
-        <polygon id="reg-kuzey-a" class="region-path" points="300,70 430,120 370,190 250,130" onclick="handleRegionClick('kuzey-a')"/>
-        <polygon id="reg-kuzey-b" class="region-path" points="570,120 700,70 750,130 630,190" onclick="handleRegionClick('kuzey-b')"/>
-        <polygon id="reg-bati-a" class="region-path" points="180,120 300,160 260,260 160,210" onclick="handleRegionClick('bati-a')"/>
-        <polygon id="reg-bati-kale" class="region-path" points="60,220 160,210 180,330 70,340" onclick="handleRegionClick('bati-kale')"/>
-        <polygon id="reg-bati-b" class="region-path" points="180,330 260,290 290,400 180,430" onclick="handleRegionClick('bati-b')"/>
-        <polygon id="reg-dogu-b" class="region-path" points="700,160 820,120 840,210 740,260" onclick="handleRegionClick('dogu-b')"/>
-        <polygon id="reg-dogu-kale" class="region-path" points="840,210 940,220 930,340 820,330" onclick="handleRegionClick('dogu-kale')"/>
-        <polygon id="reg-dogu-a" class="region-path" points="740,290 820,330 820,430 710,400" onclick="handleRegionClick('dogu-a')"/>
-        <polygon id="reg-guney-b" class="region-path" points="260,420 370,370 420,440 300,480" onclick="handleRegionClick('guney-b')"/>
-        <polygon id="reg-guney-kale" class="region-path" points="440,440 560,440 550,540 450,540" onclick="handleRegionClick('guney-kale')"/>
-        <polygon id="reg-guney-a" class="region-path" points="630,370 740,420 700,480 580,440" onclick="handleRegionClick('guney-a')"/>
-        <polygon id="reg-merkez" class="region-path" points="400,240 600,240 650,330 350,330" onclick="handleRegionClick('merkez')"/>
+    <div class="map-container">
+      <svg viewBox="0 0 1000 562.5" id="game-map">
+        <!-- Zemin Vektör Çizimleri -->
+        <rect width="1000" height="562.5" fill="#0f172a"/>
+        <circle cx="500" cy="281.25" r="220" fill="none" stroke="#334155" stroke-width="4"/>
+
+        <!-- BÖLGELER (Tüm Kalan Alanlar) -->
+        <polygon id="reg-kuzey-kale" class="region-path" points="420,20 580,20 560,110 440,110" onclick="handleRegionClick('kuzey-kale')"/>
+        <polygon id="reg-kuzey-a" class="region-path" points="280,60 410,105 360,185 240,120" onclick="handleRegionClick('kuzey-a')"/>
+        <polygon id="reg-kuzey-b" class="region-path" points="590,105 720,60 760,120 640,185" onclick="handleRegionClick('kuzey-b')"/>
+
+        <polygon id="reg-bati-a" class="region-path" points="160,140 270,195 220,280 120,210" onclick="handleRegionClick('bati-a')"/>
+        <polygon id="reg-bati-kale" class="region-path" points="40,220 140,210 140,350 40,340" onclick="handleRegionClick('bati-kale')"/>
+        <polygon id="reg-bati-b" class="region-path" points="160,360 260,310 280,410 170,440" onclick="handleRegionClick('bati-b')"/>
+
+        <polygon id="reg-dogu-b" class="region-path" points="730,195 840,140 880,210 780,280" onclick="handleRegionClick('dogu-b')"/>
+        <polygon id="reg-dogu-kale" class="region-path" points="860,210 960,220 960,340 860,350" onclick="handleRegionClick('dogu-kale')"/>
+        <polygon id="reg-dogu-a" class="region-path" points="740,310 840,360 830,440 720,410" onclick="handleRegionClick('dogu-a')"/>
+
+        <polygon id="reg-guney-b" class="region-path" points="250,430 360,380 410,460 300,510" onclick="handleRegionClick('guney-b')"/>
+        <polygon id="reg-guney-kale" class="region-path" points="440,450 560,450 550,540 450,540" onclick="handleRegionClick('guney-kale')"/>
+        <polygon id="reg-guney-a" class="region-path" points="640,380 750,430 700,510 590,460" onclick="handleRegionClick('guney-a')"/>
+
+        <polygon id="reg-merkez" class="region-path" points="380,220 620,220 650,340 350,340" onclick="handleRegionClick('merkez')"/>
+
         <g id="map-labels"></g>
       </svg>
     </div>
   </div>
 
-  <!-- ZAFER PENCERESİ -->
+  <!-- ZAFER MODALI -->
   <div id="victory-modal" class="modal-overlay">
     <div class="modal-box" style="border-color:#f59e0b;">
-      <h1 style="font-size:36px; margin-bottom:10px;">🏆 ZAFER! 🏆</h1>
-      <p style="font-size:18px; margin-bottom:20px;">Tüm alanlar ele geçirildikten sonra tüm düşmanlar etkisiz hale getirildi. Helal olsun sana!</p>
+      <h1 style="font-size:32px; margin-bottom:10px;">🏆 ZAFER! 🏆</h1>
+      <p style="font-size:16px; margin-bottom:20px;">Tüm alanlar ele geçirildikten sonra tüm düşmanlar etkisiz hale getirildi. Helal olsun sana!</p>
       <button class="menu-btn green" onclick="closeVictoryAndGoHome()">🏠 Ana Menüye Dön</button>
     </div>
   </div>
@@ -188,34 +213,41 @@
     let currentRoom = null;
     let autoStartTimer = null;
     let isMicOpen = false;
+    let myPlayerId = "player_" + Math.floor(Math.random() * 10000);
 
     const playerColors = {
-      1: { fill: "rgba(220, 38, 38, 0.65)", stroke: "#ef4444" },
-      2: { fill: "rgba(37, 99, 235, 0.65)", stroke: "#3b82f6" },
-      3: { fill: "rgba(22, 163, 74, 0.65)", stroke: "#22c55e" },
-      4: { fill: "rgba(202, 138, 4, 0.65)", stroke: "#eab308" }
+      1: { fill: "rgba(220, 38, 38, 0.7)", stroke: "#ef4444" },
+      2: { fill: "rgba(37, 99, 235, 0.7)", stroke: "#3b82f6" },
+      3: { fill: "rgba(22, 163, 74, 0.7)", stroke: "#22c55e" },
+      4: { fill: "rgba(202, 138, 4, 0.7)", stroke: "#eab308" }
     };
 
     const centers = {
-      'kuzey-kale': [500, 70],  'kuzey-a': [335, 130], 'kuzey-b': [665, 130],
-      'bati-kale': [120, 275],  'bati-a': [225, 185],  'bati-b': [230, 360],
-      'dogu-kale': [885, 275],  'dogu-a': [775, 360],  'dogu-b': [775, 185],
-      'guney-kale': [500, 490], 'guney-b': [335, 430], 'guney-a': [665, 430],
-      'merkez': [500, 285]
+      'kuzey-kale': [500, 65],  'kuzey-a': [345, 120], 'kuzey-b': [655, 120],
+      'bati-kale': [90, 280],   'bati-a': [200, 205],  'bati-b': [210, 375],
+      'dogu-kale': [910, 280],  'dogu-a': [785, 375],  'dogu-b': [790, 205],
+      'guney-kale': [500, 495], 'guney-b': [330, 445], 'guney-a': [670, 445],
+      'merkez': [500, 280]
     };
 
     const neighbors = {
-      'kuzey-kale': ['kuzey-a', 'kuzey-b'], 'kuzey-a': ['kuzey-kale', 'kuzey-b', 'bati-a', 'merkez'],
-      'kuzey-b': ['kuzey-kale', 'kuzey-a', 'dogu-b', 'merkez'], 'bati-kale': ['bati-a', 'bati-b'],
-      'bati-a': ['bati-kale', 'kuzey-a', 'merkez'], 'bati-b': ['bati-kale', 'guney-b', 'merkez'],
-      'dogu-kale': ['dogu-a', 'dogu-b'], 'dogu-a': ['dogu-kale', 'guney-a', 'merkez'],
-      'dogu-b': ['dogu-kale', 'kuzey-b', 'merkez'], 'guney-kale': ['guney-a', 'guney-b'],
-      'guney-a': ['guney-kale', 'guney-b', 'dogu-a', 'merkez'], 'guney-b': ['guney-kale', 'guney-a', 'bati-b', 'merkez'],
+      'kuzey-kale': ['kuzey-a', 'kuzey-b'],
+      'kuzey-a': ['kuzey-kale', 'kuzey-b', 'bati-a', 'merkez'],
+      'kuzey-b': ['kuzey-kale', 'kuzey-a', 'dogu-b', 'merkez'],
+      'bati-kale': ['bati-a', 'bati-b'],
+      'bati-a': ['bati-kale', 'kuzey-a', 'merkez'],
+      'bati-b': ['bati-kale', 'guney-b', 'merkez'],
+      'dogu-kale': ['dogu-a', 'dogu-b'],
+      'dogu-a': ['dogu-kale', 'guney-a', 'merkez'],
+      'dogu-b': ['dogu-kale', 'kuzey-b', 'merkez'],
+      'guney-kale': ['guney-a', 'guney-b'],
+      'guney-a': ['guney-kale', 'guney-b', 'dogu-a', 'merkez'],
+      'guney-b': ['guney-kale', 'guney-a', 'bati-b', 'merkez'],
       'merkez': ['kuzey-a', 'kuzey-b', 'bati-a', 'bati-b', 'dogu-a', 'dogu-b', 'guney-a', 'guney-b']
     };
 
-    let regions = {}, castleHealth = { 1: 3, 2: 3, 3: 3, 4: 3 }, scores = { 1: 1000, 2: 1000, 3: 1000, 4: 1000 };
-    let activePlayer = 1, phase = "SELECT";
+    let regions = {}, scores = { 1: 1000, 2: 1000, 3: 1000, 4: 1000 };
+    let activePlayer = 1;
 
     function showScreen(id) {
       if (autoStartTimer) clearInterval(autoStartTimer);
@@ -224,13 +256,18 @@
       if (id === 'screen-joinroom') renderRoomList();
     }
 
-    // --- HIZLI BAŞLA & TEST MODU (3 Saniye Otoyükleme) ---
+    /* --- ODA YÖNETİMİ DÜZELTMELERİ --- */
     function quickStart() {
       let testRoom = {
         id: Date.now(),
-        name: "Test Odası #1",
+        name: "Hızlı Savaş #1",
         pass: "",
-        players: ["Sen (Oyuncu)", "Oyuncu_2 (Test)", "Oyuncu_3 (Test)", "Oyuncu_4 (Test)"],
+        players: [
+          { id: myPlayerId, name: "Sen (Kuzey)" },
+          { id: "bot1", name: "Bot (Batı)" },
+          { id: "bot2", name: "Bot (Doğu)" },
+          { id: "bot3", name: "Bot (Güney)" }
+        ],
         isHost: true
       };
       enterLobby(testRoom, true, true);
@@ -239,7 +276,7 @@
     function submitCreateRoom() {
       let name = document.getElementById('create-room-name').value || "Savaş Odası";
       let pass = document.getElementById('create-room-pass').value;
-      let newRoom = { id: Date.now(), name, pass, players: ["Sen (Kurucu)"], isHost: true };
+      let newRoom = { id: Date.now(), name, pass, players: [{ id: myPlayerId, name: "Sen (Kurucu)" }], isHost: true };
       rooms.push(newRoom);
       enterLobby(newRoom, true, false);
     }
@@ -266,8 +303,12 @@
         let p = prompt("Oda Şifresini Girin:");
         if (p !== r.pass) { alert("Hatalı Şifre!"); return; }
       }
-      if(r.players.length >= 4) { alert("Oda Dolu!"); return; }
-      r.players.push("Sen (Oyuncu)");
+      
+      // Tekrarlı Oyuncu Engelleme
+      if (!r.players.some(p => p.id === myPlayerId)) {
+        if(r.players.length >= 4) { alert("Oda Dolu!"); return; }
+        r.players.push({ id: myPlayerId, name: "Sen (Oyuncu)" });
+      }
       enterLobby(r, false, false);
     }
 
@@ -298,8 +339,20 @@
     function updateLobbyUI() {
       document.getElementById('player-count').innerText = currentRoom.players.length;
       let ul = document.getElementById('player-list');
-      ul.innerHTML = currentRoom.players.map(p => `<li>${p}</li>`).join('');
+      ul.innerHTML = currentRoom.players.map(p => `<li>${p.name}</li>`).join('');
       document.getElementById('start-game-btn').style.display = currentRoom.isHost ? 'block' : 'none';
+    }
+
+    function leaveRoom() {
+      if (autoStartTimer) clearInterval(autoStartTimer);
+      if (currentRoom) {
+        // Çıkarken kullanıcıyı listeden temizle
+        currentRoom.players = currentRoom.players.filter(p => p.id !== myPlayerId);
+        if (currentRoom.players.length === 0) {
+          rooms = rooms.filter(r => r.id !== currentRoom.id);
+        }
+      }
+      showScreen('screen-newgame');
     }
 
     function tryStartGame() {
@@ -309,11 +362,6 @@
       }
       initGame();
       showScreen('screen-game');
-    }
-
-    function leaveRoom() {
-      if (autoStartTimer) clearInterval(autoStartTimer);
-      showScreen('screen-newgame');
     }
 
     function sendMessage() {
@@ -330,13 +378,14 @@
       document.getElementById('mic-btn').innerText = isMicOpen ? "🎙️ Sesi Kapat (Açık)" : "🎙️ Sesi Aç";
     }
 
-    // --- HARİTA & OYUN MOTORU ---
+    /* --- OYUN & SAVAŞ MEKANİĞİ --- */
     function initGame() {
-      Object.keys(centers).forEach(key => regions[key] = { owner: null, points: 0, isCastle: false });
+      Object.keys(centers).forEach(key => regions[key] = { owner: null, points: 200, isCastle: false });
       regions['kuzey-kale'] = { owner: 1, points: 1000, isCastle: true };
       regions['bati-kale'] = { owner: 2, points: 1000, isCastle: true };
       regions['dogu-kale'] = { owner: 3, points: 1000, isCastle: true };
       regions['guney-kale'] = { owner: 4, points: 1000, isCastle: true };
+      activePlayer = 1;
       renderMapUI();
     }
 
@@ -352,12 +401,11 @@
         if (reg.owner !== null) {
           pathElem.setAttribute('fill', playerColors[reg.owner].fill);
           pathElem.setAttribute('stroke', playerColors[reg.owner].stroke);
-          pathElem.setAttribute('stroke-width', '3');
 
           const icon = document.createElementNS("http://www.w3.org/2000/svg", "text");
-          icon.setAttribute("x", center[0]); icon.setAttribute("y", center[1] - 10);
-          icon.setAttribute("class", "unit-icon");
-          icon.textContent = reg.isCastle ? ("🏰".repeat(castleHealth[reg.owner]) || "💥") : "💂";
+          icon.setAttribute("x", center[0]); icon.setAttribute("y", center[1] - 8);
+          icon.setAttribute("class", "map-text");
+          icon.textContent = reg.isCastle ? "🏰" : "💂";
           labelsGroup.appendChild(icon);
 
           const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -375,52 +423,78 @@
     }
 
     function handleRegionClick(targetRegId) {
-      if (activePlayer !== 1) return;
-      let valid = getSelectableTargets(1);
-      if (!valid.includes(targetRegId)) return;
+      if (activePlayer !== 1) return; // Sıra oyuncuda değilse
+      let validTargets = getValidTargets(1);
+      
+      if (!validTargets.includes(targetRegId)) return;
 
-      if (phase === "SELECT" && regions[targetRegId].owner === null) {
-        regions[targetRegId].owner = 1;
-        regions[targetRegId].points = 200;
-        scores[1] += 200;
-        checkPhase(); nextTurn();
+      let target = regions[targetRegId];
+
+      if (target.owner === null) {
+        // Boş Bölge Ele Geçirme
+        target.owner = 1;
+        scores[1] += target.points;
+        nextTurn();
+      } else if (target.owner !== 1) {
+        // SAVAŞ MANTIGI (Düşman Bölgesine Saldırı)
+        let playerDice = Math.floor(Math.random() * 6) + 1;
+        let enemyDice = Math.floor(Math.random() * 6) + 1;
+
+        if (playerDice >= enemyDice) {
+          alert(`⚔️ Saldırı Başarılı! (Zarınız: ${playerDice} vs Düşman: ${enemyDice})\nBölgeyi ele geçirdiniz!`);
+          scores[target.owner] -= target.points;
+          target.owner = 1;
+          scores[1] += target.points;
+        } else {
+          alert(`💥 Saldırı Başarısız! (Zarınız: ${playerDice} vs Düşman: ${enemyDice})\nBirlikleriniz geri püskürtüldü!`);
+        }
+        nextTurn();
       }
     }
 
-    function getSelectableTargets(player) {
+    function getValidTargets(player) {
       let owned = Object.keys(regions).filter(id => regions[id].owner === player);
       let targets = new Set();
-      owned.forEach(id => neighbors[id].forEach(n => { if (regions[n].owner === null) targets.add(n); }));
-      if (targets.size === 0) Object.keys(regions).forEach(id => { if (regions[id].owner === null) targets.add(id); });
+      owned.forEach(id => {
+        neighbors[id].forEach(n => {
+          if (regions[n].owner !== player) targets.add(n);
+        });
+      });
       return Array.from(targets);
     }
 
-    function checkPhase() {
-      let emptyLeft = Object.keys(regions).some(i => regions[i].owner === null);
-      if (!emptyLeft) phase = "BATTLE";
+    function nextTurn() {
+      checkVictory();
+      activePlayer = (activePlayer % 4) + 1;
+      renderMapUI();
+      if (activePlayer !== 1) setTimeout(botTurn, 700);
+    }
 
+    function botTurn() {
+      let targets = getValidTargets(activePlayer);
+      if (targets.length > 0) {
+        let choice = targets[Math.floor(Math.random() * targets.length)];
+        let target = regions[choice];
+        if (target.owner === null) {
+          target.owner = activePlayer;
+          scores[activePlayer] += target.points;
+        } else {
+          // Bot Saldırısı
+          if (Math.random() > 0.4) {
+            scores[target.owner] -= target.points;
+            target.owner = activePlayer;
+            scores[activePlayer] += target.points;
+          }
+        }
+      }
+      nextTurn();
+    }
+
+    function checkVictory() {
       let activeOwners = new Set(Object.values(regions).map(r => r.owner));
       if (activeOwners.size === 1 && activeOwners.has(1)) {
         document.getElementById('victory-modal').style.display = 'flex';
       }
-    }
-
-    function nextTurn() {
-      activePlayer = (activePlayer % 4) + 1;
-      renderMapUI();
-      if (activePlayer !== 1) setTimeout(botTurn, 600);
-    }
-
-    function botTurn() {
-      let targets = getSelectableTargets(activePlayer);
-      if (targets.length > 0) {
-        let choice = targets[Math.floor(Math.random() * targets.length)];
-        regions[choice].owner = activePlayer;
-        regions[choice].points = 200;
-        scores[activePlayer] += 200;
-      }
-      checkPhase();
-      nextTurn();
     }
 
     function closeVictoryAndGoHome() {

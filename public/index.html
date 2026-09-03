@@ -13,19 +13,44 @@
     .player-card { flex: 1; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 13px; border: 2px solid rgba(255,255,255,0.2); }
     .player-card.eliminated { opacity: 0.25; filter: grayscale(1); }
 
-    #game-container { position: relative; max-width: 750px; margin: 15px auto; padding: 0 10px; }
+    #game-container { position: relative; max-width: 900px; margin: 15px auto; padding: 0 10px; }
     #status-bar { font-size: 16px; font-weight: bold; color: #38bdf8; margin-bottom: 12px; background: #1e293b; padding: 8px; border-radius: 6px; }
 
-    /* SVG Harita Stilleri */
-    svg { width: 100%; height: auto; background: #131c2e; border-radius: 16px; border: 4px solid #2a3a5c; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    /* Harita Kapsayıcısı ve Resim Arkaplanı */
+    .map-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 16px;
+      border: 4px solid #2a3a5c;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      overflow: hidden;
+      background: #131c2e;
+    }
+
+    .map-bg-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* SVG Harita Katmanı */
+    svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
     
     /* Bölge Renk Sınırları ve Efektler */
     .region-path { cursor: pointer; transition: all 0.25s ease; stroke-linejoin: round; }
-    .region-path:hover { filter: brightness(1.25); opacity: 0.9; }
+    .region-path:hover { filter: brightness(1.3); opacity: 0.85; }
 
     /* Asker, Kale ve Puan Metin Yazıları */
-    .map-text { font-size: 11px; font-weight: 800; fill: #ffffff; text-anchor: middle; dominant-baseline: central; pointer-events: none; text-shadow: 1px 1px 3px #000, -1px -1px 3px #000; }
-    .unit-icon { font-size: 16px; pointer-events: none; text-anchor: middle; dominant-baseline: central; }
+    .map-text { font-size: 14px; font-weight: 800; fill: #ffffff; text-anchor: middle; dominant-baseline: central; pointer-events: none; text-shadow: 1px 1px 4px #000, -1px -1px 4px #000; }
+    .unit-icon { font-size: 20px; pointer-events: none; text-anchor: middle; dominant-baseline: central; }
     
     /* Modal Arayüzü */
     #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 999; }
@@ -50,34 +75,40 @@
   <div id="game-container">
     <div id="status-bar">Süre: <span id="time-left">10</span>s | <span id="phase-title">Savaş Başlıyor...</span></div>
     
-    <svg viewBox="0 0 800 800" id="map-svg">
-      
-      <!-- KUZEY BÖLGELERİ -->
-      <path id="reg-kuzey-kale" class="region-path" d="M 320,30 L 480,30 L 480,120 L 320,120 Z" fill="#334155" stroke="#64748b" stroke-width="3.5" onclick="handleRegionClick('kuzey-kale')"/>
-      <path id="reg-kuzey-a" class="region-path" d="M 160,130 L 390,130 L 390,230 L 260,230 Z" fill="#334155" stroke="#64748b" stroke-width="3.5" onclick="handleRegionClick('kuzey-a')"/>
-      <path id="reg-kuzey-b" class="region-path" d="M 410,130 L 640,130 L 540,230 L 410,230 Z" fill="#334155" stroke="#64748b" stroke-width="3.5" onclick="handleRegionClick('kuzey-b')"/>
+    <div class="map-wrapper">
+      <!-- Gerçek İllüstrasyon Görsel (Dosya yolunuzu buraya yazın) -->
+      <img src="harita.jpg" alt="Dört Krallık Haritası" class="map-bg-img">
 
-      <!-- BATI BÖLGELERİ -->
-      <path id="reg-bati-a" class="region-path" d="M 140,240 L 250,240 L 250,390 L 140,340 Z" fill="#334155" stroke="#64748b" stroke-width="3.5" onclick="handleRegionClick('bati-a')"/>
-      <path id="reg-bati-kale" class="region-path" d="M 30,350 L 130,350 L 130,450 L 30,450 Z" fill="#334155" stroke="#64748b" stroke-width="3.5" onclick="handleRegionClick('bati-kale')"/>
-      <path id="reg-bati-b" class="region-path" d="M 140,400 L 250,400 L 250,550 L 140,550 Z" fill="#334155" stroke="#64748b" stroke-width="3.5" onclick="handleRegionClick('bati-b')"/>
+      <!-- İnteraktif SVG Poligon Katmanı -->
+      <svg viewBox="0 0 1000 562.5" id="map-svg">
+        
+        <!-- KUZEY BÖLGELERİ -->
+        <polygon id="reg-kuzey-kale" class="region-path" points="440,20 560,20 550,120 450,120" fill="transparent" stroke="rgba(255,255,255,0.3)" stroke-width="2" onclick="handleRegionClick('kuzey-kale')"/>
+        <polygon id="reg-kuzey-a" class="region-path" points="300,70 430,120 370,190 250,130" fill="transparent" stroke="rgba(255,255,255,0.3)" stroke-width="2" onclick="handleRegionClick('kuzey-a')"/>
+        <polygon id="reg-kuzey-b" class="region-path" points="570,120 700,70 750,130 630,190" fill="transparent" stroke="rgba(255,255,255,0.3)" stroke-width="2" onclick="handleRegionClick('kuzey-b')"/>
 
-      <!-- DOĞU BÖLGELERİ -->
-      <path id="reg-dogu-a" class="region-path" d="M 550,400 L 660,400 L 660,550 L 550,550 Z" fill="#334155" stroke="#64748b" stroke-width="3.5" onclick="handleRegionClick('dogu-a')"/>
-      <path id="reg-dogu-kale" class="region-path" d="M 670,350 L 770,350 L 770,450 L 670,450 Z" fill="#334155" stroke="#64748b" stroke-width="3.5" onclick="handleRegionClick('dogu-kale')"/>
-      <path id="reg-dogu-b" class="region-path" d="M 550,240 L 660,240 L 660,390 L 550,390 Z" fill="#334155" stroke="#64748b" stroke-width="3.5" onclick="handleRegionClick('dogu-b')"/>
+        <!-- BATI BÖLGELERİ -->
+        <polygon id="reg-bati-a" class="region-path" points="180,120 300,160 260,260 160,210" fill="transparent" stroke="rgba(255,255,255,0.3)" stroke-width="2" onclick="handleRegionClick('bati-a')"/>
+        <polygon id="reg-bati-kale" class="region-path" points="60,220 160,210 180,330 70,340" fill="transparent" stroke="rgba(255,255,255,0.3)" stroke-width="2" onclick="handleRegionClick('bati-kale')"/>
+        <polygon id="reg-bati-b" class="region-path" points="180,330 260,290 290,400 180,430" fill="transparent" stroke="rgba(255,255,255,0.3)" stroke-width="2" onclick="handleRegionClick('bati-b')"/>
 
-      <!-- GÜNEY BÖLGELERİ -->
-      <path id="reg-guney-b" class="region-path" d="M 160,660 L 390,660 L 390,560 L 260,560 Z" fill="#334155" stroke="#64748b" stroke-width="3.5" onclick="handleRegionClick('guney-b')"/>
-      <path id="reg-guney-kale" class="region-path" d="M 320,670 L 480,670 L 480,760 L 320,760 Z" fill="#334155" stroke="#64748b" stroke-width="3.5" onclick="handleRegionClick('guney-kale')"/>
-      <path id="reg-guney-a" class="region-path" d="M 410,660 L 640,660 L 540,560 L 410,560 Z" fill="#334155" stroke="#64748b" stroke-width="3.5" onclick="handleRegionClick('guney-a')"/>
+        <!-- DOĞU BÖLGELERİ -->
+        <polygon id="reg-dogu-b" class="region-path" points="700,160 820,120 840,210 740,260" fill="transparent" stroke="rgba(255,255,255,0.3)" stroke-width="2" onclick="handleRegionClick('dogu-b')"/>
+        <polygon id="reg-dogu-kale" class="region-path" points="840,210 940,220 930,340 820,330" fill="transparent" stroke="rgba(255,255,255,0.3)" stroke-width="2" onclick="handleRegionClick('dogu-kale')"/>
+        <polygon id="reg-dogu-a" class="region-path" points="740,290 820,330 820,430 710,400" fill="transparent" stroke="rgba(255,255,255,0.3)" stroke-width="2" onclick="handleRegionClick('dogu-a')"/>
 
-      <!-- MERKEZ (BÖLGE 16 / TAPINAK) -->
-      <circle id="reg-merkez" class="region-path" cx="400" cy="395" r="110" fill="#334155" stroke="#64748b" stroke-width="4" onclick="handleRegionClick('merkez')"/>
+        <!-- GÜNEY BÖLGELERİ -->
+        <polygon id="reg-guney-b" class="region-path" points="260,420 370,370 420,440 300,480" fill="transparent" stroke="rgba(255,255,255,0.3)" stroke-width="2" onclick="handleRegionClick('guney-b')"/>
+        <polygon id="reg-guney-kale" class="region-path" points="440,440 560,440 550,540 450,540" fill="transparent" stroke="rgba(255,255,255,0.3)" stroke-width="2" onclick="handleRegionClick('guney-kale')"/>
+        <polygon id="reg-guney-a" class="region-path" points="630,370 740,420 700,480 580,440" fill="transparent" stroke="rgba(255,255,255,0.3)" stroke-width="2" onclick="handleRegionClick('guney-a')"/>
 
-      <!-- Dinamik Katman: Asker İkonları ve Metinler -->
-      <g id="map-labels"></g>
-    </svg>
+        <!-- MERKEZ (BÖLGE 16 / TAPINAK) -->
+        <polygon id="reg-merkez" class="region-path" points="400,240 600,240 650,330 350,330" fill="transparent" stroke="rgba(255,255,255,0.3)" stroke-width="2" onclick="handleRegionClick('merkez')"/>
+
+        <!-- Dinamik Katman: Asker İkonları ve Metinler -->
+        <g id="map-labels"></g>
+      </svg>
+    </div>
   </div>
 
   <div id="modal-overlay">
@@ -85,24 +116,24 @@
   </div>
 
   <script>
-    // Oyuncu Renk Kodları (Dolgu ve Sınır Hatları)
+    // Oyuncu Renk Kodları (Görseli Bozmayan Şeffaf Dolgu ve Parlak Sınır Hatları)
     const playerColors = {
-      1: { fill: "#7f1d1d", stroke: "#ef4444" }, // Kırmızı (Kuzey)
-      2: { fill: "#1e3a8a", stroke: "#3b82f6" }, // Mavi (Batı)
-      3: { fill: "#14532d", stroke: "#22c55e" }, // Yeşil (Doğu)
-      4: { fill: "#713f12", stroke: "#eab308" }  // Sarı (Güney)
+      1: { fill: "rgba(220, 38, 38, 0.45)", stroke: "#ef4444" }, // Kırmızı (Kuzey)
+      2: { fill: "rgba(37, 99, 235, 0.45)", stroke: "#3b82f6" }, // Mavi (Batı)
+      3: { fill: "rgba(22, 163, 74, 0.45)", stroke: "#22c55e" }, // Yeşil (Doğu)
+      4: { fill: "rgba(202, 138, 4, 0.45)", stroke: "#eab308" }  // Sarı (Güney)
     };
 
-    // Bölge Merkez Koordinatları (İkon ve Puan Konumlandırmaları)
+    // Bölge Merkez Koordinatları (İkon ve Puan Konumlandırmaları - Görsel Üzerine Tam Hizalı)
     const centers = {
-      'kuzey-kale': [400, 75], 'kuzey-a': [290, 180], 'kuzey-b': [510, 180],
-      'bati-kale': [80, 400],  'bati-a': [195, 290],  'bati-b': [195, 480],
-      'dogu-kale': [720, 400], 'dogu-a': [605, 480],  'dogu-b': [605, 290],
-      'guney-kale': [400, 715], 'guney-b': [290, 610], 'guney-a': [510, 610],
-      'merkez': [400, 395]
+      'kuzey-kale': [500, 70],  'kuzey-a': [335, 130], 'kuzey-b': [665, 130],
+      'bati-kale': [120, 275],  'bati-a': [225, 185],  'bati-b': [230, 360],
+      'dogu-kale': [885, 275],  'dogu-a': [775, 360],  'dogu-b': [775, 185],
+      'guney-kale': [500, 490], 'guney-b': [335, 430], 'guney-a': [665, 430],
+      'merkez': [500, 285]
     };
 
-    // Bölge Komşuluk Ağı
+    // Bölge Komşuluk Ağı (Tamamen Aynı Tutuldu)
     const neighbors = {
       'kuzey-kale': ['kuzey-a', 'kuzey-b'],
       'kuzey-a': ['kuzey-kale', 'kuzey-b', 'bati-a', 'merkez'],
@@ -160,12 +191,12 @@
           // Sahibinin Rengi ve Sınırını Uygula
           pathElem.setAttribute('fill', playerColors[reg.owner].fill);
           pathElem.setAttribute('stroke', playerColors[reg.owner].stroke);
-          pathElem.setAttribute('stroke-width', '4');
+          pathElem.setAttribute('stroke-width', '3.5');
 
           // Asker veya Kale İkonu Ekle
           const icon = document.createElementNS("http://www.w3.org/2000/svg", "text");
           icon.setAttribute("x", center[0]);
-          icon.setAttribute("y", center[1] - 10);
+          icon.setAttribute("y", center[1] - 12);
           icon.setAttribute("class", "unit-icon");
           icon.textContent = reg.isCastle ? "🏰" : "💂";
           labelsGroup.appendChild(icon);
@@ -175,21 +206,13 @@
           text.setAttribute("x", center[0]);
           text.setAttribute("y", center[1] + 12);
           text.setAttribute("class", "map-text");
-          text.textContent = reg.isCastle ? `${reg.points} P` : `${reg.points} P`;
+          text.textContent = `${reg.points} P`;
           labelsGroup.appendChild(text);
         } else {
-          // Boş Bölge Görünümü
-          pathElem.setAttribute('fill', '#1e293b');
-          pathElem.setAttribute('stroke', '#475569');
-          pathElem.setAttribute('stroke-width', '2');
-
-          const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-          text.setAttribute("x", center[0]);
-          text.setAttribute("y", center[1]);
-          text.setAttribute("class", "map-text");
-          text.setAttribute("fill", "#94a3b8");
-          text.textContent = regId === 'merkez' ? "MERKEZ" : "Boş";
-          labelsGroup.appendChild(text);
+          // Boş Bölge Görünümü (Resim Üzerinde Görünmez/Şeffaf Kalır)
+          pathElem.setAttribute('fill', 'transparent');
+          pathElem.setAttribute('stroke', 'rgba(255, 255, 255, 0.25)');
+          pathElem.setAttribute('stroke-width', '1.5');
         }
       });
 

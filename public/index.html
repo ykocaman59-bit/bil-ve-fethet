@@ -8,20 +8,20 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     body { background: #080d1a; color: #fff; user-select: none; overflow-x: hidden; }
 
-    /* --- AÇILIŞ ANİMASYONU --- */
+    /* --- AÇILIŞ ANİMASYONU (5 SANİYE) --- */
     #splash-screen {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       background: #000; z-index: 9999; display: flex; flex-direction: column;
       justify-content: center; align-items: center; text-align: center;
-      animation: fadeOut 0.8s ease 3s forwards;
+      animation: fadeOut 1s ease 5s forwards;
     }
-    .splash-img { width: 320px; max-width: 80%; border-radius: 16px; box-shadow: 0 0 30px #f59e0b; animation: zoomIn 1.5s ease; }
-    .splash-title { font-size: 32px; font-weight: 900; color: #f59e0b; margin-top: 20px; text-shadow: 0 0 10px #f59e0b; letter-spacing: 2px; }
+    .splash-img { width: 85%; max-width: 500px; border-radius: 16px; box-shadow: 0 0 35px #f59e0b; animation: zoomIn 2s ease; border: 2px solid #f59e0b; }
+    .splash-title { font-size: 34px; font-weight: 900; color: #f59e0b; margin-top: 25px; text-shadow: 0 0 15px #f59e0b; letter-spacing: 3px; }
 
-    @keyframes zoomIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes zoomIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
 
-    /* --- ANA MENÜ & EKRANLAR --- */
+    /* --- EKRAN DÜZENİ --- */
     .screen { display: none; width: 100%; max-width: 900px; margin: 0 auto; padding: 20px; text-align: center; }
     .screen.active { display: block; }
 
@@ -36,7 +36,6 @@
     .menu-btn.red { background: linear-gradient(135deg, #dc2626, #b91c1c); }
     .menu-btn.green { background: linear-gradient(135deg, #16a34a, #15803d); }
 
-    /* Sıralama & Oda Listeleri */
     .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #1e293b; border-radius: 8px; overflow: hidden; }
     .data-table th, .data-table td { padding: 12px; border-bottom: 1px solid #334155; text-align: center; }
     .data-table th { background: #0f172a; color: #f59e0b; }
@@ -48,9 +47,11 @@
     .lobby-box { flex: 1; min-width: 280px; background: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #334155; }
     .chat-messages { height: 140px; overflow-y: auto; background: #0f172a; padding: 8px; border-radius: 6px; font-size: 13px; margin-bottom: 8px; }
 
-    /* --- OYUN EKRANI --- */
+    #countdown-banner { font-size: 18px; color: #eab308; font-weight: bold; margin-bottom: 10px; display: none; }
+
+    /* --- HARİTA VE OYUN --- */
     #scoreboard { display: flex; justify-content: space-around; padding: 10px; background: #0f172a; gap: 6px; border-radius: 8px; margin-bottom: 10px; }
-    .player-card { flex: 1; padding: 8px; border-radius: 6px; font-weight: bold; font-size: 11px; border: 2px solid rgba(255,255,255,0.15); }
+    .player-card { flex: 1; padding: 8px; border-radius: 6px; font-weight: bold; font-size: 11px; border: 2px solid rgba(255,255,255,0.15); text-align: center; }
     .player-card.active { border-color: #f59e0b; box-shadow: 0 0 10px #f59e0b; }
 
     .map-wrapper { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; border: 3px solid #334155; overflow: hidden; background: #0f172a; }
@@ -61,19 +62,15 @@
     .map-text { font-size: 13px; font-weight: 800; fill: #fff; text-anchor: middle; dominant-baseline: central; pointer-events: none; text-shadow: 1px 1px 4px #000; }
     .unit-icon { font-size: 18px; pointer-events: none; text-anchor: middle; dominant-baseline: central; }
 
-    /* MODAL & ZAFER PENCERESİ */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; }
     .modal-box { background: #1e293b; padding: 24px; border-radius: 12px; max-width: 480px; width: 90%; border: 1px solid #475569; text-align: center; }
   </style>
 </head>
 <body>
 
-  <!-- AÇILIŞ ANİMASYONU (3 Saniye) -->
+  <!-- AÇILIŞ ANİMASYONU -->
   <div id="splash-screen">
-    <svg class="splash-img" viewBox="0 0 100 100" style="background:#1e293b; padding:20px; border-radius:20px;">
-      <path d="M 50 10 L 90 30 L 90 70 L 50 90 L 10 70 L 10 30 Z" fill="#f59e0b" stroke="#fff" stroke-width="2"/>
-      <text x="50" y="55" font-size="30" text-anchor="middle" fill="#000">⚔️</text>
-    </svg>
+    <img src="1000223978_8.png" alt="Fetih Savaşı Haritası" class="splash-img">
     <div class="splash-title">FETİH SAVAŞI</div>
   </div>
 
@@ -84,24 +81,22 @@
     <button class="menu-btn" onclick="showScreen('screen-leaderboard')">🏆 Canlı Sıralama</button>
   </div>
 
-  <!-- CANLI SIRALAMA -->
+  <!-- CANLI SIRALAMA (BOŞ / SIFIRLANMIŞ) -->
   <div id="screen-leaderboard" class="screen">
     <h2>🏆 Canlı Sıralama Tablosu</h2>
     <table class="data-table">
       <thead><tr><th>Sıra</th><th>Oyuncu</th><th>Zaferler</th><th>Puan</th></tr></thead>
-      <tbody>
-        <tr><td>1</td><td>Sultan_Alp</td><td>142</td><td>14,200</td></tr>
-        <tr><td>2</td><td>Fatih_53</td><td>118</td><td>11,800</td></tr>
-        <tr><td>3</td><td>Korkusuz</td><td>95</td><td>9,500</td></tr>
+      <tbody id="leaderboard-body">
+        <tr><td colspan="4" style="color:#94a3b8; padding:20px;">Henüz dereceye giren oyuncu yok. İlk zaferi sen kazan!</td></tr>
       </tbody>
     </table>
-    <button class="menu-btn red" onclick="showScreen('screen-main')">⬅️ Ana Menüye Dön</button>
+    <button class="menu-btn red" onclick="showScreen('screen-main')" style="margin-top:20px;">⬅️ Ana Menüye Dön</button>
   </div>
 
   <!-- YENİ OYUN MENÜSÜ -->
   <div id="screen-newgame" class="screen">
     <h2>🎮 Oyun Modu Seçin</h2>
-    <button class="menu-btn green" onclick="quickStart()">⚡ Hızlı Başla</button>
+    <button class="menu-btn green" onclick="quickStart()">⚡ Hızlı Başla (Test Modu)</button>
     <button class="menu-btn" onclick="showScreen('screen-createroom')">➕ Oda Kur</button>
     <button class="menu-btn" onclick="showScreen('screen-joinroom')">🔍 Odaya Katıl</button>
     <button class="menu-btn red" onclick="showScreen('screen-main')">⬅️ Ana Menüye Dön</button>
@@ -129,6 +124,7 @@
   <!-- ODA LOBİSİ -->
   <div id="screen-lobby" class="screen">
     <h2 id="lobby-title">Oda Lobisi</h2>
+    <div id="countdown-banner">⏳ Test Modu: Oyun <span id="timer-val">3</span> saniye içinde başlıyor...</div>
     <div id="lobby-layout">
       <div class="lobby-box">
         <h3>Oyuncular (<span id="player-count">1</span>/4)</h3>
@@ -137,7 +133,7 @@
       <div class="lobby-box">
         <h3>💬 Chat & Sesli Sohbet</h3>
         <div class="chat-messages" id="chat-box"></div>
-        <input type="text" id="chat-input" placeholder="Mesaj yazın..." style="width:70%;">
+        <input type="text" id="chat-input" placeholder="Mesaj yazın..." style="width:65%;">
         <button onclick="sendMessage()" style="padding:8px;">Gönder</button>
         <button id="mic-btn" onclick="toggleMic()" style="padding:8px; margin-top:5px; width:100%;">🎙️ Sesi Aç</button>
       </div>
@@ -158,7 +154,7 @@
 
     <div class="map-wrapper">
       <svg viewBox="0 0 1000 562.5">
-        <rect width="1000" height="562.5" fill="#1e293b"/>
+        <image href="1000223978_8.png" x="0" y="0" width="1000" height="562.5" />
         <!-- Poligon Bölgeleri -->
         <polygon id="reg-kuzey-kale" class="region-path" points="440,20 560,20 550,120 450,120" onclick="handleRegionClick('kuzey-kale')"/>
         <polygon id="reg-kuzey-a" class="region-path" points="300,70 430,120 370,190 250,130" onclick="handleRegionClick('kuzey-a')"/>
@@ -178,12 +174,7 @@
     </div>
   </div>
 
-  <!-- Soru Modalı -->
-  <div id="modal-overlay" class="modal-overlay">
-    <div class="modal-box" id="modal-content"></div>
-  </div>
-
-  <!-- ZAFER MODALI -->
+  <!-- ZAFER PENCERESİ -->
   <div id="victory-modal" class="modal-overlay">
     <div class="modal-box" style="border-color:#f59e0b;">
       <h1 style="font-size:36px; margin-bottom:10px;">🏆 ZAFER! 🏆</h1>
@@ -193,15 +184,11 @@
   </div>
 
   <script>
-    // --- ODA SİSTEMİ VERİLERİ ---
-    let rooms = [
-      { id: 1, name: "Fetih Meydanı #1", pass: "", players: ["Oyuncu_1", "Savaşçı_X", "Kral_99"], isHost: false },
-      { id: 2, name: "Klan Savaşı (Şifreli)", pass: "1234", players: ["Lider"], isHost: false }
-    ];
+    let rooms = [];
     let currentRoom = null;
+    let autoStartTimer = null;
     let isMicOpen = false;
 
-    // --- HARİTA VE OYUN VERİLERİ ---
     const playerColors = {
       1: { fill: "rgba(220, 38, 38, 0.65)", stroke: "#ef4444" },
       2: { fill: "rgba(37, 99, 235, 0.65)", stroke: "#3b82f6" },
@@ -228,25 +215,25 @@
     };
 
     let regions = {}, castleHealth = { 1: 3, 2: 3, 3: 3, 4: 3 }, scores = { 1: 1000, 2: 1000, 3: 1000, 4: 1000 };
-    let activePlayer = 1, phase = "SELECT", battleState = null;
+    let activePlayer = 1, phase = "SELECT";
 
     function showScreen(id) {
+      if (autoStartTimer) clearInterval(autoStartTimer);
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
       if (id === 'screen-joinroom') renderRoomList();
     }
 
-    // --- HIZLI BAŞLA MANTIĞI ---
+    // --- HIZLI BAŞLA & TEST MODU (3 Saniye Otoyükleme) ---
     function quickStart() {
-      let openRoom = rooms.find(r => r.pass === "" && r.players.length < 4);
-      if (openRoom) {
-        openRoom.players.push("Sen (Oyuncu)");
-        enterLobby(openRoom, false);
-      } else {
-        let newRoom = { id: Date.now(), name: "Hızlı Oda #" + Math.floor(Math.random()*100), pass: "", players: ["Sen (Oyuncu)", "Bot_1", "Bot_2"], isHost: true };
-        rooms.push(newRoom);
-        enterLobby(newRoom, true);
-      }
+      let testRoom = {
+        id: Date.now(),
+        name: "Test Odası #1",
+        pass: "",
+        players: ["Sen (Oyuncu)", "Oyuncu_2 (Test)", "Oyuncu_3 (Test)", "Oyuncu_4 (Test)"],
+        isHost: true
+      };
+      enterLobby(testRoom, true, true);
     }
 
     function submitCreateRoom() {
@@ -254,12 +241,16 @@
       let pass = document.getElementById('create-room-pass').value;
       let newRoom = { id: Date.now(), name, pass, players: ["Sen (Kurucu)"], isHost: true };
       rooms.push(newRoom);
-      enterLobby(newRoom, true);
+      enterLobby(newRoom, true, false);
     }
 
     function renderRoomList() {
       let tbody = document.getElementById('room-list-body');
       tbody.innerHTML = "";
+      if (rooms.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="3" style="color:#94a3b8; padding:15px;">Aktif oda bulunamadı. Lütfen bir oda kurun.</td></tr>`;
+        return;
+      }
       rooms.forEach(r => {
         tbody.innerHTML += `<tr>
           <td>${r.name} ${r.pass ? '🔒' : ''}</td>
@@ -277,15 +268,31 @@
       }
       if(r.players.length >= 4) { alert("Oda Dolu!"); return; }
       r.players.push("Sen (Oyuncu)");
-      enterLobby(r, false);
+      enterLobby(r, false, false);
     }
 
-    function enterLobby(room, isHost) {
+    function enterLobby(room, isHost, isTestMode) {
       currentRoom = room;
-      currentRoom.isHost = isHost;
       showScreen('screen-lobby');
       document.getElementById('lobby-title').innerText = room.name;
       updateLobbyUI();
+
+      let banner = document.getElementById('countdown-banner');
+      if (isTestMode) {
+        banner.style.display = 'block';
+        let left = 3;
+        document.getElementById('timer-val').innerText = left;
+        autoStartTimer = setInterval(() => {
+          left--;
+          document.getElementById('timer-val').innerText = left;
+          if (left <= 0) {
+            clearInterval(autoStartTimer);
+            tryStartGame();
+          }
+        }, 1000);
+      } else {
+        banner.style.display = 'none';
+      }
     }
 
     function updateLobbyUI() {
@@ -305,9 +312,7 @@
     }
 
     function leaveRoom() {
-      if (currentRoom) {
-        currentRoom.players = currentRoom.players.filter(p => !p.startsWith("Sen"));
-      }
+      if (autoStartTimer) clearInterval(autoStartTimer);
       showScreen('screen-newgame');
     }
 
@@ -325,7 +330,7 @@
       document.getElementById('mic-btn').innerText = isMicOpen ? "🎙️ Sesi Kapat (Açık)" : "🎙️ Sesi Aç";
     }
 
-    // --- OYUN MOTORU ---
+    // --- HARİTA & OYUN MOTORU ---
     function initGame() {
       Object.keys(centers).forEach(key => regions[key] = { owner: null, points: 0, isCastle: false });
       regions['kuzey-kale'] = { owner: 1, points: 1000, isCastle: true };
@@ -394,7 +399,6 @@
       let emptyLeft = Object.keys(regions).some(i => regions[i].owner === null);
       if (!emptyLeft) phase = "BATTLE";
 
-      // Zafer Kontrolü (1 Oyuncu Tüm Alanları Ele Geçirdiyse)
       let activeOwners = new Set(Object.values(regions).map(r => r.owner));
       if (activeOwners.size === 1 && activeOwners.has(1)) {
         document.getElementById('victory-modal').style.display = 'flex';

@@ -3,127 +3,205 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bil ve Fethet - Dört Krallık Savaşı</title>
+  <title>Fetih Savaşı</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-    body { background: #080d1a; color: #fff; user-select: none; text-align: center; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background: #080d1a; color: #fff; user-select: none; overflow-x: hidden; }
 
-    header { background: #111827; padding: 12px; font-size: 20px; font-weight: bold; border-bottom: 2px solid #1f2937; letter-spacing: 1px; color: #f59e0b; }
-
-    /* Skor Tablosu */
-    #scoreboard { display: flex; justify-content: space-around; padding: 10px; background: #0f172a; gap: 6px; }
-    .player-card { flex: 1; padding: 10px; border-radius: 8px; font-weight: bold; font-size: 12px; border: 2px solid rgba(255,255,255,0.15); transition: 0.3s; }
-    .player-card.active { border-color: #f59e0b; box-shadow: 0 0 10px #f59e0b; }
-    .player-card.eliminated { opacity: 0.2; filter: grayscale(1); }
-
-    /* Oyun Alanı ve Durum Çubuğu */
-    #game-container { position: relative; max-width: 950px; margin: 10px auto; padding: 0 10px; }
-    #status-bar { font-size: 15px; font-weight: bold; color: #38bdf8; background: #1e293b; padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #334155; }
-
-    /* Harita Kapsayıcısı */
-    .map-wrapper {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      border-radius: 12px;
-      border: 3px solid #334155;
-      overflow: hidden;
-      background: #0f172a;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+    /* --- AÇILIŞ ANİMASYONU --- */
+    #splash-screen {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #000; z-index: 9999; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; text-align: center;
+      animation: fadeOut 0.8s ease 3s forwards;
     }
+    .splash-img { width: 320px; max-width: 80%; border-radius: 16px; box-shadow: 0 0 30px #f59e0b; animation: zoomIn 1.5s ease; }
+    .splash-title { font-size: 32px; font-weight: 900; color: #f59e0b; margin-top: 20px; text-shadow: 0 0 10px #f59e0b; letter-spacing: 2px; }
 
+    @keyframes zoomIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+
+    /* --- ANA MENÜ & EKRANLAR --- */
+    .screen { display: none; width: 100%; max-width: 900px; margin: 0 auto; padding: 20px; text-align: center; }
+    .screen.active { display: block; }
+
+    h1, h2 { color: #f59e0b; margin-bottom: 15px; }
+
+    .menu-btn {
+      display: block; width: 100%; max-width: 320px; margin: 12px auto; padding: 14px;
+      font-size: 16px; font-weight: bold; color: #fff; background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border: none; border-radius: 8px; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .menu-btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
+    .menu-btn.red { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+    .menu-btn.green { background: linear-gradient(135deg, #16a34a, #15803d); }
+
+    /* Sıralama & Oda Listeleri */
+    .data-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #1e293b; border-radius: 8px; overflow: hidden; }
+    .data-table th, .data-table td { padding: 12px; border-bottom: 1px solid #334155; text-align: center; }
+    .data-table th { background: #0f172a; color: #f59e0b; }
+
+    input { width: 80%; max-width: 300px; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #475569; background: #0f172a; color: #fff; text-align: center; }
+
+    /* --- LOBİ VE SOHBET --- */
+    #lobby-layout { display: flex; flex-wrap: wrap; gap: 15px; text-align: left; margin-top: 15px; }
+    .lobby-box { flex: 1; min-width: 280px; background: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #334155; }
+    .chat-messages { height: 140px; overflow-y: auto; background: #0f172a; padding: 8px; border-radius: 6px; font-size: 13px; margin-bottom: 8px; }
+
+    /* --- OYUN EKRANI --- */
+    #scoreboard { display: flex; justify-content: space-around; padding: 10px; background: #0f172a; gap: 6px; border-radius: 8px; margin-bottom: 10px; }
+    .player-card { flex: 1; padding: 8px; border-radius: 6px; font-weight: bold; font-size: 11px; border: 2px solid rgba(255,255,255,0.15); }
+    .player-card.active { border-color: #f59e0b; box-shadow: 0 0 10px #f59e0b; }
+
+    .map-wrapper { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; border: 3px solid #334155; overflow: hidden; background: #0f172a; }
     svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-    /* Harita Bölge Etkileşimi */
-    .region-path { cursor: pointer; transition: all 0.25s ease; stroke-linejoin: round; }
+    .region-path { cursor: pointer; transition: 0.2s; }
     .region-path:hover { filter: brightness(1.3); }
-
-    .map-text { font-size: 13px; font-weight: 800; fill: #ffffff; text-anchor: middle; dominant-baseline: central; pointer-events: none; text-shadow: 1px 1px 4px #000, -1px -1px 4px #000; }
+    .map-text { font-size: 13px; font-weight: 800; fill: #fff; text-anchor: middle; dominant-baseline: central; pointer-events: none; text-shadow: 1px 1px 4px #000; }
     .unit-icon { font-size: 18px; pointer-events: none; text-anchor: middle; dominant-baseline: central; }
 
-    /* Soru ve Modal Ekranları */
-    #modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 999; }
-    .modal-box { background: #1e293b; padding: 22px; border-radius: 12px; max-width: 480px; width: 92%; border: 1px solid #475569; text-align: center; }
-    
-    .grid-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-    .btn-action { width: 100%; padding: 12px; margin: 5px 0; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    .btn-cat { background: #8b5cf6; } .btn-cat:hover { background: #7c3aed; }
-    .btn-opt { background: #334155; text-align: left; padding: 12px 15px; } .btn-opt:hover { background: #475569; }
-
-    .timer-display { font-size: 18px; font-weight: bold; color: #f59e0b; margin-bottom: 10px; }
+    /* MODAL & ZAFER PENCERESİ */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 1000; }
+    .modal-box { background: #1e293b; padding: 24px; border-radius: 12px; max-width: 480px; width: 90%; border: 1px solid #475569; text-align: center; }
   </style>
 </head>
 <body>
 
-  <header>⚔️ BİL VE FETHET - DÖRT KRALLIK SAVAŞI ⚔️</header>
-
-  <div id="scoreboard">
-    <div id="p1" class="player-card active" style="background:#dc2626">1. KUZEY (Kırmızı)<br><span id="s1">1000</span> P</div>
-    <div id="p2" class="player-card" style="background:#2563eb">2. BATI (Mavi)<br><span id="s2">1000</span> P</div>
-    <div id="p3" class="player-card" style="background:#16a34a">3. DOĞU (Yeşil)<br><span id="s3">1000</span> P</div>
-    <div id="p4" class="player-card" style="background:#ca8a04">4. GÜNEY (Sarı)<br><span id="s4">1000</span> P</div>
+  <!-- AÇILIŞ ANİMASYONU (3 Saniye) -->
+  <div id="splash-screen">
+    <svg class="splash-img" viewBox="0 0 100 100" style="background:#1e293b; padding:20px; border-radius:20px;">
+      <path d="M 50 10 L 90 30 L 90 70 L 50 90 L 10 70 L 10 30 Z" fill="#f59e0b" stroke="#fff" stroke-width="2"/>
+      <text x="50" y="55" font-size="30" text-anchor="middle" fill="#000">⚔️</text>
+    </svg>
+    <div class="splash-title">FETİH SAVAŞI</div>
   </div>
 
-  <div id="game-container">
-    <div id="status-bar"><span id="phase-title">1. Tur: Sahipsiz Bir Bölge Seçin</span></div>
-    
+  <!-- ANA MENÜ -->
+  <div id="screen-main" class="screen active" style="margin-top: 40px;">
+    <h1>⚔️ FETİH SAVAŞI ⚔️</h1>
+    <button class="menu-btn green" onclick="showScreen('screen-newgame')">🎮 Yeni Oyun</button>
+    <button class="menu-btn" onclick="showScreen('screen-leaderboard')">🏆 Canlı Sıralama</button>
+  </div>
+
+  <!-- CANLI SIRALAMA -->
+  <div id="screen-leaderboard" class="screen">
+    <h2>🏆 Canlı Sıralama Tablosu</h2>
+    <table class="data-table">
+      <thead><tr><th>Sıra</th><th>Oyuncu</th><th>Zaferler</th><th>Puan</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Sultan_Alp</td><td>142</td><td>14,200</td></tr>
+        <tr><td>2</td><td>Fatih_53</td><td>118</td><td>11,800</td></tr>
+        <tr><td>3</td><td>Korkusuz</td><td>95</td><td>9,500</td></tr>
+      </tbody>
+    </table>
+    <button class="menu-btn red" onclick="showScreen('screen-main')">⬅️ Ana Menüye Dön</button>
+  </div>
+
+  <!-- YENİ OYUN MENÜSÜ -->
+  <div id="screen-newgame" class="screen">
+    <h2>🎮 Oyun Modu Seçin</h2>
+    <button class="menu-btn green" onclick="quickStart()">⚡ Hızlı Başla</button>
+    <button class="menu-btn" onclick="showScreen('screen-createroom')">➕ Oda Kur</button>
+    <button class="menu-btn" onclick="showScreen('screen-joinroom')">🔍 Odaya Katıl</button>
+    <button class="menu-btn red" onclick="showScreen('screen-main')">⬅️ Ana Menüye Dön</button>
+  </div>
+
+  <!-- ODA KUR -->
+  <div id="screen-createroom" class="screen">
+    <h2>➕ Oda Kur</h2>
+    <input type="text" id="create-room-name" placeholder="Oda Adı Girin"><br>
+    <input type="password" id="create-room-pass" placeholder="Şifre (İsteğe Bağlı)"><br>
+    <button class="menu-btn green" onclick="submitCreateRoom()">Odayı Oluştur</button>
+    <button class="menu-btn red" onclick="showScreen('screen-newgame')">Geri</button>
+  </div>
+
+  <!-- ODAYA KATIL -->
+  <div id="screen-joinroom" class="screen">
+    <h2>🔍 Açık Odalar</h2>
+    <table class="data-table">
+      <thead><tr><th>Oda Adı</th><th>Durum</th><th>Eylem</th></tr></thead>
+      <tbody id="room-list-body"></tbody>
+    </table>
+    <button class="menu-btn red" onclick="showScreen('screen-newgame')" style="margin-top:15px;">Geri</button>
+  </div>
+
+  <!-- ODA LOBİSİ -->
+  <div id="screen-lobby" class="screen">
+    <h2 id="lobby-title">Oda Lobisi</h2>
+    <div id="lobby-layout">
+      <div class="lobby-box">
+        <h3>Oyuncular (<span id="player-count">1</span>/4)</h3>
+        <ul id="player-list" style="margin: 10px 0 0 20px;"></ul>
+      </div>
+      <div class="lobby-box">
+        <h3>💬 Chat & Sesli Sohbet</h3>
+        <div class="chat-messages" id="chat-box"></div>
+        <input type="text" id="chat-input" placeholder="Mesaj yazın..." style="width:70%;">
+        <button onclick="sendMessage()" style="padding:8px;">Gönder</button>
+        <button id="mic-btn" onclick="toggleMic()" style="padding:8px; margin-top:5px; width:100%;">🎙️ Sesi Aç</button>
+      </div>
+    </div>
+    <br>
+    <button id="start-game-btn" class="menu-btn green" onclick="tryStartGame()">🚀 Oyuna Başla</button>
+    <button class="menu-btn red" onclick="leaveRoom()">🚪 Odadan Çık</button>
+  </div>
+
+  <!-- OYUN ALANI -->
+  <div id="screen-game" class="screen">
+    <div id="scoreboard">
+      <div id="p1" class="player-card active" style="background:#dc2626">1. KUZEY<br><span id="s1">1000</span> P</div>
+      <div id="p2" class="player-card" style="background:#2563eb">2. BATI<br><span id="s2">1000</span> P</div>
+      <div id="p3" class="player-card" style="background:#16a34a">3. DOĞU<br><span id="s3">1000</span> P</div>
+      <div id="p4" class="player-card" style="background:#ca8a04">4. GÜNEY<br><span id="s4">1000</span> P</div>
+    </div>
+
     <div class="map-wrapper">
-      <svg viewBox="0 0 1000 562.5" id="map-svg">
-        <defs>
-          <!-- Zemin Desenleri -->
-          <radialGradient id="bg-grad" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#1e293b"/>
-            <stop offset="100%" stop-color="#0f172a"/>
-          </radialGradient>
-        </defs>
-
-        <!-- Arka Plan Zemin -->
-        <rect width="1000" height="562.5" fill="url(#bg-grad)"/>
-
-        <!-- Vektörel Harita Teması Görselleri -->
-        <!-- Kuzey Orman Bölgesi -->
-        <path d="M 250 20 L 750 20 L 650 200 L 350 200 Z" fill="#14532d" opacity="0.3"/>
-        <!-- Batı Çöl Bölgesi -->
-        <path d="M 20 100 L 350 100 L 350 450 L 20 450 Z" fill="#78350f" opacity="0.3"/>
-        <!-- Doğu Kar Bölgesi -->
-        <path d="M 650 100 L 980 100 L 980 450 L 650 450 Z" fill="#1e3a8a" opacity="0.3"/>
-        <!-- Güney Çayır Bölgesi -->
-        <path d="M 250 360 L 750 360 L 750 540 L 250 540 Z" fill="#15803d" opacity="0.3"/>
-
-        <!-- BÖLGE POLİGONLARI -->
-        <!-- KUZEY -->
+      <svg viewBox="0 0 1000 562.5">
+        <rect width="1000" height="562.5" fill="#1e293b"/>
+        <!-- Poligon Bölgeleri -->
         <polygon id="reg-kuzey-kale" class="region-path" points="440,20 560,20 550,120 450,120" onclick="handleRegionClick('kuzey-kale')"/>
         <polygon id="reg-kuzey-a" class="region-path" points="300,70 430,120 370,190 250,130" onclick="handleRegionClick('kuzey-a')"/>
         <polygon id="reg-kuzey-b" class="region-path" points="570,120 700,70 750,130 630,190" onclick="handleRegionClick('kuzey-b')"/>
-
-        <!-- BATI -->
         <polygon id="reg-bati-a" class="region-path" points="180,120 300,160 260,260 160,210" onclick="handleRegionClick('bati-a')"/>
         <polygon id="reg-bati-kale" class="region-path" points="60,220 160,210 180,330 70,340" onclick="handleRegionClick('bati-kale')"/>
         <polygon id="reg-bati-b" class="region-path" points="180,330 260,290 290,400 180,430" onclick="handleRegionClick('bati-b')"/>
-
-        <!-- DOĞU -->
         <polygon id="reg-dogu-b" class="region-path" points="700,160 820,120 840,210 740,260" onclick="handleRegionClick('dogu-b')"/>
         <polygon id="reg-dogu-kale" class="region-path" points="840,210 940,220 930,340 820,330" onclick="handleRegionClick('dogu-kale')"/>
         <polygon id="reg-dogu-a" class="region-path" points="740,290 820,330 820,430 710,400" onclick="handleRegionClick('dogu-a')"/>
-
-        <!-- GÜNEY -->
         <polygon id="reg-guney-b" class="region-path" points="260,420 370,370 420,440 300,480" onclick="handleRegionClick('guney-b')"/>
         <polygon id="reg-guney-kale" class="region-path" points="440,440 560,440 550,540 450,540" onclick="handleRegionClick('guney-kale')"/>
         <polygon id="reg-guney-a" class="region-path" points="630,370 740,420 700,480 580,440" onclick="handleRegionClick('guney-a')"/>
-
-        <!-- MERKEZ TAPINAK -->
         <polygon id="reg-merkez" class="region-path" points="400,240 600,240 650,330 350,330" onclick="handleRegionClick('merkez')"/>
-
         <g id="map-labels"></g>
       </svg>
     </div>
   </div>
 
-  <div id="modal-overlay">
+  <!-- Soru Modalı -->
+  <div id="modal-overlay" class="modal-overlay">
     <div class="modal-box" id="modal-content"></div>
   </div>
 
+  <!-- ZAFER MODALI -->
+  <div id="victory-modal" class="modal-overlay">
+    <div class="modal-box" style="border-color:#f59e0b;">
+      <h1 style="font-size:36px; margin-bottom:10px;">🏆 ZAFER! 🏆</h1>
+      <p style="font-size:18px; margin-bottom:20px;">Tüm alanlar ele geçirildikten sonra tüm düşmanlar etkisiz hale getirildi. Helal olsun sana!</p>
+      <button class="menu-btn green" onclick="closeVictoryAndGoHome()">🏠 Ana Menüye Dön</button>
+    </div>
+  </div>
+
   <script>
+    // --- ODA SİSTEMİ VERİLERİ ---
+    let rooms = [
+      { id: 1, name: "Fetih Meydanı #1", pass: "", players: ["Oyuncu_1", "Savaşçı_X", "Kral_99"], isHost: false },
+      { id: 2, name: "Klan Savaşı (Şifreli)", pass: "1234", players: ["Lider"], isHost: false }
+    ];
+    let currentRoom = null;
+    let isMicOpen = false;
+
+    // --- HARİTA VE OYUN VERİLERİ ---
     const playerColors = {
       1: { fill: "rgba(220, 38, 38, 0.65)", stroke: "#ef4444" },
       2: { fill: "rgba(37, 99, 235, 0.65)", stroke: "#3b82f6" },
@@ -140,55 +218,120 @@
     };
 
     const neighbors = {
-      'kuzey-kale': ['kuzey-a', 'kuzey-b'],
-      'kuzey-a': ['kuzey-kale', 'kuzey-b', 'bati-a', 'merkez'],
-      'kuzey-b': ['kuzey-kale', 'kuzey-a', 'dogu-b', 'merkez'],
-      'bati-kale': ['bati-a', 'bati-b'],
-      'bati-a': ['bati-kale', 'kuzey-a', 'merkez'],
-      'bati-b': ['bati-kale', 'guney-b', 'merkez'],
-      'dogu-kale': ['dogu-a', 'dogu-b'],
-      'dogu-a': ['dogu-kale', 'guney-a', 'merkez'],
-      'dogu-b': ['dogu-kale', 'kuzey-b', 'merkez'],
-      'guney-kale': ['guney-a', 'guney-b'],
-      'guney-a': ['guney-kale', 'guney-b', 'dogu-a', 'merkez'],
-      'guney-b': ['guney-kale', 'guney-a', 'bati-b', 'merkez'],
+      'kuzey-kale': ['kuzey-a', 'kuzey-b'], 'kuzey-a': ['kuzey-kale', 'kuzey-b', 'bati-a', 'merkez'],
+      'kuzey-b': ['kuzey-kale', 'kuzey-a', 'dogu-b', 'merkez'], 'bati-kale': ['bati-a', 'bati-b'],
+      'bati-a': ['bati-kale', 'kuzey-a', 'merkez'], 'bati-b': ['bati-kale', 'guney-b', 'merkez'],
+      'dogu-kale': ['dogu-a', 'dogu-b'], 'dogu-a': ['dogu-kale', 'guney-a', 'merkez'],
+      'dogu-b': ['dogu-kale', 'kuzey-b', 'merkez'], 'guney-kale': ['guney-a', 'guney-b'],
+      'guney-a': ['guney-kale', 'guney-b', 'dogu-a', 'merkez'], 'guney-b': ['guney-kale', 'guney-a', 'bati-b', 'merkez'],
       'merkez': ['kuzey-a', 'kuzey-b', 'bati-a', 'bati-b', 'dogu-a', 'dogu-b', 'guney-a', 'guney-b']
     };
 
-    const questionBank = {
-      "Coğrafya": [
-        { q: "Türkiye'nin başkenti neresidir?", options: ["İstanbul", "Ankara", "İzmir", "Bursa"], answer: 1 },
-        { q: "Dünyanın en uzun nehri hangisidir?", options: ["Nil", "Amazon", "Fırat", "Tuna"], answer: 0 }
-      ],
-      "Müzik": [
-        { q: "İstiklal Marşı'nın bestecisi kimdir?", options: ["Osman Zeki Üngör", "Mehmet Akif Ersoy", "Itri", "Münir Nurettin"], answer: 0 }
-      ],
-      "Spor": [
-        { q: "Futbol maçı bir takımda kaç kişiyle oynanır?", options: ["10", "11", "12", "9"], answer: 1 }
-      ],
-      "Tarih": [
-        { q: "İstanbul hangi yılda fethedilmiştir?", options: ["1071", "1299", "1453", "1923"], answer: 2 }
-      ]
-    };
+    let regions = {}, castleHealth = { 1: 3, 2: 3, 3: 3, 4: 3 }, scores = { 1: 1000, 2: 1000, 3: 1000, 4: 1000 };
+    let activePlayer = 1, phase = "SELECT", battleState = null;
 
-    let regions = {};
-    let castleHealth = { 1: 3, 2: 3, 3: 3, 4: 3 };
-    let scores = { 1: 1000, 2: 1000, 3: 1000, 4: 1000 };
-    let activePlayer = 1;
-    let phase = "SELECT";
-    let battleState = null;
-    let questionStartTime = 0;
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      if (id === 'screen-joinroom') renderRoomList();
+    }
 
-    function initGame() {
-      Object.keys(centers).forEach(key => {
-        regions[key] = { owner: null, points: 0, isCastle: false };
+    // --- HIZLI BAŞLA MANTIĞI ---
+    function quickStart() {
+      let openRoom = rooms.find(r => r.pass === "" && r.players.length < 4);
+      if (openRoom) {
+        openRoom.players.push("Sen (Oyuncu)");
+        enterLobby(openRoom, false);
+      } else {
+        let newRoom = { id: Date.now(), name: "Hızlı Oda #" + Math.floor(Math.random()*100), pass: "", players: ["Sen (Oyuncu)", "Bot_1", "Bot_2"], isHost: true };
+        rooms.push(newRoom);
+        enterLobby(newRoom, true);
+      }
+    }
+
+    function submitCreateRoom() {
+      let name = document.getElementById('create-room-name').value || "Savaş Odası";
+      let pass = document.getElementById('create-room-pass').value;
+      let newRoom = { id: Date.now(), name, pass, players: ["Sen (Kurucu)"], isHost: true };
+      rooms.push(newRoom);
+      enterLobby(newRoom, true);
+    }
+
+    function renderRoomList() {
+      let tbody = document.getElementById('room-list-body');
+      tbody.innerHTML = "";
+      rooms.forEach(r => {
+        tbody.innerHTML += `<tr>
+          <td>${r.name} ${r.pass ? '🔒' : ''}</td>
+          <td>${r.players.length}/4</td>
+          <td><button class="menu-btn green" style="padding:6px; margin:0;" onclick="joinSpecificRoom(${r.id})">Katıl</button></td>
+        </tr>`;
       });
+    }
 
+    function joinSpecificRoom(id) {
+      let r = rooms.find(x => x.id === id);
+      if (r.pass !== "") {
+        let p = prompt("Oda Şifresini Girin:");
+        if (p !== r.pass) { alert("Hatalı Şifre!"); return; }
+      }
+      if(r.players.length >= 4) { alert("Oda Dolu!"); return; }
+      r.players.push("Sen (Oyuncu)");
+      enterLobby(r, false);
+    }
+
+    function enterLobby(room, isHost) {
+      currentRoom = room;
+      currentRoom.isHost = isHost;
+      showScreen('screen-lobby');
+      document.getElementById('lobby-title').innerText = room.name;
+      updateLobbyUI();
+    }
+
+    function updateLobbyUI() {
+      document.getElementById('player-count').innerText = currentRoom.players.length;
+      let ul = document.getElementById('player-list');
+      ul.innerHTML = currentRoom.players.map(p => `<li>${p}</li>`).join('');
+      document.getElementById('start-game-btn').style.display = currentRoom.isHost ? 'block' : 'none';
+    }
+
+    function tryStartGame() {
+      if (currentRoom.players.length < 4) {
+        alert("Oyuncu eksik! Oyunu başlatmak için odada 4 kişi olmalıdır.");
+        return;
+      }
+      initGame();
+      showScreen('screen-game');
+    }
+
+    function leaveRoom() {
+      if (currentRoom) {
+        currentRoom.players = currentRoom.players.filter(p => !p.startsWith("Sen"));
+      }
+      showScreen('screen-newgame');
+    }
+
+    function sendMessage() {
+      let input = document.getElementById('chat-input');
+      if (!input.value) return;
+      let box = document.getElementById('chat-box');
+      box.innerHTML += `<div><b>Sen:</b> ${input.value}</div>`;
+      input.value = "";
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function toggleMic() {
+      isMicOpen = !isMicOpen;
+      document.getElementById('mic-btn').innerText = isMicOpen ? "🎙️ Sesi Kapat (Açık)" : "🎙️ Sesi Aç";
+    }
+
+    // --- OYUN MOTORU ---
+    function initGame() {
+      Object.keys(centers).forEach(key => regions[key] = { owner: null, points: 0, isCastle: false });
       regions['kuzey-kale'] = { owner: 1, points: 1000, isCastle: true };
       regions['bati-kale'] = { owner: 2, points: 1000, isCastle: true };
       regions['dogu-kale'] = { owner: 3, points: 1000, isCastle: true };
       regions['guney-kale'] = { owner: 4, points: 1000, isCastle: true };
-
       renderMapUI();
     }
 
@@ -204,242 +347,82 @@
         if (reg.owner !== null) {
           pathElem.setAttribute('fill', playerColors[reg.owner].fill);
           pathElem.setAttribute('stroke', playerColors[reg.owner].stroke);
-          pathElem.setAttribute('stroke-width', '3.5');
+          pathElem.setAttribute('stroke-width', '3');
 
           const icon = document.createElementNS("http://www.w3.org/2000/svg", "text");
-          icon.setAttribute("x", center[0]);
-          icon.setAttribute("y", center[1] - 12);
+          icon.setAttribute("x", center[0]); icon.setAttribute("y", center[1] - 10);
           icon.setAttribute("class", "unit-icon");
-          
-          if (reg.isCastle) {
-            let towers = "🏰".repeat(castleHealth[reg.owner]);
-            icon.textContent = towers || "💥";
-          } else {
-            icon.textContent = "💂";
-          }
+          icon.textContent = reg.isCastle ? ("🏰".repeat(castleHealth[reg.owner]) || "💥") : "💂";
           labelsGroup.appendChild(icon);
 
           const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-          text.setAttribute("x", center[0]);
-          text.setAttribute("y", center[1] + 12);
+          text.setAttribute("x", center[0]); text.setAttribute("y", center[1] + 12);
           text.setAttribute("class", "map-text");
           text.textContent = `${reg.points} P`;
           labelsGroup.appendChild(text);
         } else {
-          pathElem.setAttribute('fill', 'rgba(255, 255, 255, 0.08)');
-          pathElem.setAttribute('stroke', 'rgba(255, 255, 255, 0.4)');
-          pathElem.setAttribute('stroke-width', '2');
+          pathElem.setAttribute('fill', 'rgba(255,255,255,0.08)');
+          pathElem.setAttribute('stroke', 'rgba(255,255,255,0.3)');
         }
       });
 
-      for (let i = 1; i <= 4; i++) {
-        document.getElementById(`s${i}`).innerText = scores[i];
-        const card = document.getElementById(`p${i}`);
-        if (i === activePlayer) card.classList.add('active');
-        else card.classList.remove('active');
-      }
+      for (let i = 1; i <= 4; i++) document.getElementById(`s${i}`).innerText = scores[i];
     }
 
     function handleRegionClick(targetRegId) {
       if (activePlayer !== 1) return;
+      let valid = getSelectableTargets(1);
+      if (!valid.includes(targetRegId)) return;
 
-      let validTargets = getSelectableTargets(activePlayer);
-      if (!validTargets.includes(targetRegId)) {
-        alert("Geçersiz hamle! Lütfen fethedebileceğiniz geçerli bir alan seçin.");
-        return;
-      }
-
-      let targetReg = regions[targetRegId];
-
-      if (phase === "SELECT" && targetReg.owner === null) {
-        openCategoryModal(targetRegId, null);
-      } else if (phase === "BATTLE" && targetReg.owner !== null && targetReg.owner !== activePlayer) {
-        openCategoryModal(targetRegId, targetReg.owner);
+      if (phase === "SELECT" && regions[targetRegId].owner === null) {
+        regions[targetRegId].owner = 1;
+        regions[targetRegId].points = 200;
+        scores[1] += 200;
+        checkPhase(); nextTurn();
       }
     }
 
-    // Komşuluk Tıkanıklığını Önleyen Esnek Hedef Algoritması
     function getSelectableTargets(player) {
       let owned = Object.keys(regions).filter(id => regions[id].owner === player);
       let targets = new Set();
-
-      if (phase === "SELECT") {
-        owned.forEach(id => {
-          neighbors[id].forEach(n => {
-            if (regions[n].owner === null) targets.add(n);
-          });
-        });
-
-        // Eğer komşularda hiç boş yer kalmadıysa tüm haritadaki boş yerleri aç (Kilitlenmeyi Önler)
-        if (targets.size === 0) {
-          Object.keys(regions).forEach(id => {
-            if (regions[id].owner === null) targets.add(id);
-          });
-        }
-      } else if (phase === "BATTLE") {
-        owned.forEach(id => {
-          neighbors[id].forEach(n => {
-            if (regions[n].owner !== null && regions[n].owner !== player) targets.add(n);
-          });
-        });
-      }
-
+      owned.forEach(id => neighbors[id].forEach(n => { if (regions[n].owner === null) targets.add(n); }));
+      if (targets.size === 0) Object.keys(regions).forEach(id => { if (regions[id].owner === null) targets.add(id); });
       return Array.from(targets);
     }
 
-    function openCategoryModal(targetRegId, defenderId) {
-      battleState = { targetRegId, attackerId: activePlayer, defenderId };
-      let modal = document.getElementById('modal-overlay');
-      let content = document.getElementById('modal-content');
+    function checkPhase() {
+      let emptyLeft = Object.keys(regions).some(i => regions[i].owner === null);
+      if (!emptyLeft) phase = "BATTLE";
 
-      let html = `<h3>Fetih Kategorisi Seçin</h3><div class="grid-btns">`;
-      Object.keys(questionBank).forEach(cat => {
-        html += `<button class="btn-action btn-cat" onclick="startQuestion('${cat}')">${cat}</button>`;
-      });
-      html += `</div>`;
-      content.innerHTML = html;
-      modal.style.display = 'flex';
-    }
-
-    function startQuestion(category) {
-      let questions = questionBank[category];
-      let qObj = questions[Math.floor(Math.random() * questions.length)];
-      battleState.qObj = qObj;
-
-      let modalContent = document.getElementById('modal-content');
-      let html = `<div class="timer-display">⏱️ Süre Ölçülüyor...</div>`;
-      html += `<h3>${category} Sorusu</h3><p style="margin:15px 0; font-size:16px;">${qObj.q}</p><div>`;
-      
-      qObj.options.forEach((opt, idx) => {
-        html += `<button class="btn-action btn-opt" onclick="submitAnswer(${idx})">${opt}</button>`;
-      });
-      html += `</div>`;
-      modalContent.innerHTML = html;
-
-      questionStartTime = Date.now();
-    }
-
-    function submitAnswer(chosenIdx) {
-      let timeTaken = ((Date.now() - questionStartTime) / 1000).toFixed(2);
-      let isCorrect = chosenIdx === battleState.qObj.answer;
-
-      document.getElementById('modal-overlay').style.display = 'none';
-
-      let defenderCorrect = Math.random() > 0.4;
-      let defenderTime = (Math.random() * 3 + 2.5).toFixed(2);
-
-      let attackerWon = false;
-
-      if (isCorrect) {
-        if (!defenderCorrect || parseFloat(timeTaken) < parseFloat(defenderTime)) {
-          attackerWon = true;
-        }
-      }
-
-      processBattleResult(attackerWon, isCorrect, timeTaken, defenderCorrect, defenderTime);
-    }
-
-    function processBattleResult(attackerWon, pCorrect, pTime, botCorrect, botTime) {
-      let target = regions[battleState.targetRegId];
-
-      if (phase === "SELECT") {
-        if (attackerWon) {
-          target.owner = battleState.attackerId;
-          target.points = 200;
-          scores[battleState.attackerId] += 200;
-          alert(`Tebrikler! (${pTime}s) Bölgeyi fethettiniz.`);
-        } else {
-          alert(`Başarısız! Soruyu yanlış cevapladınız veya rakip daha hızlı yanıt verdi.`);
-        }
-      } else if (phase === "BATTLE") {
-        if (target.isCastle) {
-          if (attackerWon) {
-            castleHealth[battleState.defenderId]--;
-            alert(`Saldırı Başarılı! (${pTime}s)\nKaledeki 1 kule patladı! Kalan Kule: ${castleHealth[battleState.defenderId]}`);
-            
-            if (castleHealth[battleState.defenderId] <= 0) {
-              eliminatePlayer(battleState.defenderId, battleState.attackerId);
-            } else {
-              renderMapUI();
-              openCategoryModal(battleState.targetRegId, battleState.defenderId);
-              return;
-            }
-          } else {
-            alert(`Kale Savunması Başarılı! Saldırı püskürtüldü.`);
-          }
-        } else {
-          if (attackerWon) {
-            scores[target.owner] -= target.points;
-            target.owner = battleState.attackerId;
-            scores[battleState.attackerId] += target.points;
-            alert(`Zafer! (${pTime}s) Düşman bölgesini fethettiniz.`);
-          } else {
-            alert(`Saldırı Başarısız! Bölge fethedilemedi.`);
-          }
-        }
-      }
-
-      checkPhaseTransition();
-      nextTurn();
-    }
-
-    function eliminatePlayer(victimId, conquerorId) {
-      alert(`💥 KALE YIKILDI! Oyuncu ${victimId} tamamen elendi!\nTüm toprakları ve puanları Oyuncu ${conquerorId} tarafına geçti.`);
-      
-      Object.keys(regions).forEach(regId => {
-        if (regions[regId].owner === victimId) {
-          regions[regId].owner = conquerorId;
-        }
-      });
-
-      scores[conquerorId] += scores[victimId];
-      scores[victimId] = 0;
-      document.getElementById(`p${victimId}`).classList.add('eliminated');
-    }
-
-    function checkPhaseTransition() {
-      if (phase === "SELECT") {
-        let emptyLeft = Object.keys(regions).some(i => regions[i].owner === null);
-        if (!emptyLeft) {
-          phase = "BATTLE";
-          document.getElementById('phase-title').innerText = "SAVAŞ FAZI! Düşman Bölgelerine Saldırın!";
-          alert("Tüm bölgeler fethedildi! Savaş Fazı başlıyor.");
-        }
+      // Zafer Kontrolü (1 Oyuncu Tüm Alanları Ele Geçirdiyse)
+      let activeOwners = new Set(Object.values(regions).map(r => r.owner));
+      if (activeOwners.size === 1 && activeOwners.has(1)) {
+        document.getElementById('victory-modal').style.display = 'flex';
       }
     }
 
     function nextTurn() {
-      do {
-        activePlayer = (activePlayer % 4) + 1;
-      } while (scores[activePlayer] <= 0 && Object.values(scores).some(s => s > 0));
-
+      activePlayer = (activePlayer % 4) + 1;
       renderMapUI();
-
-      if (activePlayer !== 1) {
-        document.getElementById('phase-title').innerText = `${activePlayer}. Bot Hamle Yapıyor...`;
-        setTimeout(botTurn, 1000);
-      } else {
-        document.getElementById('phase-title').innerText = phase === "SELECT" ? "Sizin Turunuz: Boş Bir Bölge Seçin" : "Sizin Turunuz: Saldırılacak Bölge Seçin";
-      }
+      if (activePlayer !== 1) setTimeout(botTurn, 600);
     }
 
     function botTurn() {
-      let validTargets = getSelectableTargets(activePlayer);
-      if (validTargets.length > 0) {
-        let choice = validTargets[Math.floor(Math.random() * validTargets.length)];
-        let target = regions[choice];
-
-        if (phase === "SELECT") {
-          target.owner = activePlayer;
-          target.points = 200;
-          scores[activePlayer] += 200;
-        }
+      let targets = getSelectableTargets(activePlayer);
+      if (targets.length > 0) {
+        let choice = targets[Math.floor(Math.random() * targets.length)];
+        regions[choice].owner = activePlayer;
+        regions[choice].points = 200;
+        scores[activePlayer] += 200;
       }
-      checkPhaseTransition();
+      checkPhase();
       nextTurn();
     }
 
-    window.onload = initGame;
+    function closeVictoryAndGoHome() {
+      document.getElementById('victory-modal').style.display = 'none';
+      showScreen('screen-main');
+    }
   </script>
 </body>
 </html>

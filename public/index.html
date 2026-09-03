@@ -3,53 +3,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bil ve Fethet - Harita Savaşları</title>
+  <title>Bil ve Fethet - Gelişmiş Harita Savaşı</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
     body { background: #0f172a; color: #fff; text-align: center; }
     header { padding: 12px; background: #1e293b; font-size: 18px; font-weight: bold; border-bottom: 2px solid #334155; }
     
     #scoreboard { display: flex; justify-content: space-around; padding: 10px; background: #1e293b; gap: 5px; }
-    .player-card { flex: 1; padding: 8px 4px; border-radius: 6px; font-weight: bold; font-size: 12px; }
-    
+    .player-card { flex: 1; padding: 8px 4px; border-radius: 6px; font-weight: bold; font-size: 11px; opacity: 1; transition: 0.3s; }
+    .player-card.eliminated { opacity: 0.3; filter: grayscale(1); }
+
     #game-container { position: relative; max-width: 600px; margin: 10px auto; padding: 0 10px; }
-    #timer-bar { font-size: 16px; font-weight: bold; color: #ef4444; margin-bottom: 8px; }
+    #status-bar { font-size: 15px; font-weight: bold; color: #38bdf8; margin-bottom: 8px; }
 
     svg { width: 100%; height: auto; background: #1e3a8a; border-radius: 12px; border: 3px solid #3b82f6; }
     path { stroke: #0f172a; stroke-width: 2; cursor: pointer; transition: 0.2s; }
-    path:hover { opacity: 0.8; filter: brightness(1.2); }
-    text { font-weight: bold; pointer-events: none; user-select: none; }
+    path:hover { opacity: 0.85; filter: brightness(1.2); }
+    text { font-size: 18px; text-anchor: middle; dominant-baseline: central; pointer-events: none; user-select: none; }
 
-    /* Modal Soru ve Bilgi Ekranı */
+    /* Modal ve Kategori Seçim Ekranları */
     #modal-overlay {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85); justify-content: center; align-items: center; z-index: 999;
+      background: rgba(0,0,0,0.88); justify-content: center; align-items: center; z-index: 999;
     }
     .modal-box {
-      background: #1e293b; padding: 20px; border-radius: 12px; max-width: 400px; width: 90%; border: 1px solid #475569;
+      background: #1e293b; padding: 20px; border-radius: 12px; max-width: 420px; width: 90%; border: 1px solid #475569;
     }
-    .btn-opt {
-      display: block; width: 100%; padding: 12px; margin: 8px 0; background: #3b82f6; color: #fff;
-      border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer;
+    .grid-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+    .btn-action {
+      width: 100%; padding: 12px; margin: 6px 0; background: #3b82f6; color: #fff;
+      border: none; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer;
     }
+    .btn-cat { background: #8b5cf6; }
+    .btn-cat:hover { background: #7c3aed; }
+    .btn-danger { background: #ef4444; }
   </style>
 </head>
 <body>
 
-  <header>🏰 BİL VE FETHET 🏰</header>
+  <header>🏰 BİL VE FETHET - TÜRKIYE HARİTASI 🏰</header>
 
   <div id="scoreboard">
-    <div id="p1" class="player-card" style="background:#ef4444">1. Kırmızı<br><span id="s1">0</span> P</div>
-    <div id="p2" class="player-card" style="background:#3b82f6">2. Mavi<br><span id="s2">0</span> P</div>
-    <div id="p3" class="player-card" style="background:#22c55e">3. Yeşil<br><span id="s3">0</span> P</div>
-    <div id="p4" class="player-card" style="background:#eab308; color:#000">4. Sarı<br><span id="s4">0</span> P</div>
+    <div id="p1" class="player-card" style="background:#ef4444">1. Siz (Kırmızı)<br><span id="s1">1000</span> P</div>
+    <div id="p2" class="player-card" style="background:#3b82f6">2. Bot (Mavi)<br><span id="s2">1000</span> P</div>
+    <div id="p3" class="player-card" style="background:#2ecc71">3. Bot (Yeşil)<br><span id="s3">1000</span> P</div>
+    <div id="p4" class="player-card" style="background:#f1c40f; color:#000">4. Bot (Sarı)<br><span id="s4">1000</span> P</div>
   </div>
 
   <div id="game-container">
-    <div id="timer-bar">Süre: <span id="time-left">10</span>s | Aşama: <span id="phase-title">Bölge Seçimi</span></div>
+    <div id="status-bar">Süre: <span id="time-left">10</span>s | <span id="phase-title">Kurulum Yapılıyor...</span></div>
     
     <svg viewBox="0 0 600 300" id="map-svg">
-      <!-- 15 Türkiye Bölge Temsili Şeması -->
+      <!-- 15 Harita Bölgesi -->
       <path id="reg-1" d="M 10,10 L 120,10 L 110,70 L 10,70 Z" fill="#94a3b8" onclick="handleRegionClick(1)"/>
       <path id="reg-2" d="M 120,10 L 240,10 L 220,70 L 110,70 Z" fill="#94a3b8" onclick="handleRegionClick(2)"/>
       <path id="reg-3" d="M 240,10 L 360,10 L 340,70 L 220,70 Z" fill="#94a3b8" onclick="handleRegionClick(3)"/>
@@ -68,42 +73,103 @@
       <path id="reg-14" d="M 330,150 L 450,150 L 440,290 L 320,290 Z" fill="#94a3b8" onclick="handleRegionClick(14)"/>
       <path id="reg-15" d="M 450,150 L 590,150 L 590,290 L 440,290 Z" fill="#94a3b8" onclick="handleRegionClick(15)"/>
 
-      <!-- Bölge Metinleri -->
-      <g id="region-labels"></g>
+      <!-- Kale İkonları -->
+      <g id="castle-icons"></g>
     </svg>
   </div>
 
+  <!-- Modal -->
   <div id="modal-overlay">
-    <div class="modal-box">
-      <h3 id="modal-title">Soru</h3>
-      <p id="modal-desc" style="margin:10px 0; font-size:14px;"></p>
-      <div id="modal-options"></div>
-    </div>
+    <div class="modal-box" id="modal-content"></div>
   </div>
 
   <script>
-    const colors = { 1: "#ef4444", 2: "#3b82f6", 3: "#22c55e", 4: "#eab308" };
-    let regions = {}; // { id: { owner: null, points: 0, isCastle: false } }
-    let scores = { 1: 0, 2: 0, 3: 0, 4: 0 };
+    const colors = { 1: "#ef4444", 2: "#3b82f6", 3: "#2ecc71", 4: "#f1c40f" };
+    const regCenters = {
+      1:[65,40], 2:[175,40], 3:[290,40], 4:[410,40], 5:[530,40],
+      6:[55,110], 7:[160,110], 8:[275,110], 9:[395,110], 10:[520,110],
+      11:[50,220], 12:[150,220], 13:[265,220], 14:[385,220], 15:[515,220]
+    };
+
+    let regions = {};
+    let scores = { 1: 1000, 2: 1000, 3: 1000, 4: 1000 };
     let activePlayer = 1;
-    let phase = "CASTLE"; // CASTLE -> SELECT -> BATTLE
+    let phase = "SELECT"; // SELECT -> BATTLE
+    let isSpectator = false;
+    let eliminatedPlayers = [];
     let timer = null;
     let timeLeft = 10;
-    let currentTargetRegion = null;
+    let currentTargetReg = null;
 
-    const questions = [
-      { q: "Türkiye'nin başkenti neresidir?", opts: ["İstanbul", "Ankara", "İzmir", "Bursa"], a: 1 },
-      { q: "Fatih Sultan Mehmet İstanbul'u kaç yılında fethetmiştir?", opts: ["1071", "1453", "1299", "1923"], a: 1 },
-      { q: "Dünyanın en geniş okyanusu hangisidir?", opts: ["Atlas", "Hint", "Pasifik", "Arktik"], a: 2 }
-    ];
+    // Geniş Kategori Soru Havuzu
+    const questionBank = {
+      tarih: [
+        { q: "Fatih Sultan Mehmet İstanbul'u kaç yılında fethetmiştir?", opts: ["1071", "1453", "1299", "1923"], a: 1 },
+        { q: "Mustafa Kemal Atatürk hangi şehirde doğmuştur?", opts: ["Ankara", "İstanbul", "Selanik", "İzmir"], a: 2 },
+        { q: "Kurtuluş Savaşı'nı bitiren antlaşma hangisidir?", opts: ["Mondros", "Mudanya", "Lozan", "Sevr"], a: 2 }
+      ],
+      cografya: [
+        { q: "Türkiye'nin yüzölçümü en büyük bölgesi hangisidir?", opts: ["İç Anadolu", "Doğu Anadolu", "Karadeniz", "Ege"], a: 1 },
+        { q: "Türkiye'nin en uzun nehri hangisidir?", opts: ["Fırat", "Kızılırmak", "Yeşilırmak", "Dicle"], a: 1 },
+        { q: "Dünyanın en büyük okyanusu hangisidir?", opts: ["Atlas", "Pasifik", "Hint", "Kutup"], a: 1 }
+      ],
+      spor: [
+        { q: "Futbolda bir takım sahaya kaç oyuncu ile çıkar?", opts: ["9", "10", "11", "12"], a: 2 },
+        { q: "Olimpiyat oyunları kaç yılda bir düzenlenir?", opts: ["2", "3", "4", "5"], a: 2 },
+        { q: "Basketbolda serbest atış kaç sayıdır?", opts: ["1", "2", "3", "4"], a: 0 }
+      ],
+      muzik: [
+        { q: "İstiklal Marşı'mızın bestecisi kimdir?", opts: ["Mehmet Akif Ersoy", "Zeki Üngör", "Itri", "Sunay Akın"], a: 1 },
+        { q: "Piyano kaç tuştan oluşur?", opts: ["66", "72", "88", "100"], a: 2 }
+      ],
+      genel: [
+        { q: "Türkiye'nin başkenti neresidir?", opts: ["İstanbul", "Ankara", "İzmir", "Bursa"], a: 1 },
+        { q: "Periyodik cetvelde 'H' simgesi hangi elementi temsil eder?", opts: ["Helyum", "Hidrojen", "Hafniyum", "Cıva"], a: 1 }
+      ]
+    };
 
-    // Oyunu Başlat
     function initGame() {
       for (let i = 1; i <= 15; i++) {
         regions[i] = { owner: null, points: 0, isCastle: false };
       }
-      startTimer();
-      updateStatus("KALE SEÇİMİ: 1. Oyuncu Kalesini Seçsin");
+
+      // Kaleleri Otomatik Rastgele Dağıt
+      let allRegs = Array.from({length: 15}, (_, i) => i + 1).sort(() => 0.5 - Math.random());
+      for (let p = 1; p <= 4; p++) {
+        let castleReg = allRegs.pop();
+        regions[castleReg] = { owner: p, points: 1000, isCastle: true };
+        drawCastleIcon(castleReg);
+        updateRegionUI(castleReg);
+      }
+
+      renderScores();
+      startTurn();
+    }
+
+    function drawCastleIcon(regId) {
+      let center = regCenters[regId];
+      let icon = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      icon.setAttribute("x", center[0]);
+      icon.setAttribute("y", center[1]);
+      icon.setAttribute("id", `castle-icon-${regId}`);
+      icon.textContent = "🏰";
+      document.getElementById('castle-icons').appendChild(icon);
+    }
+
+    function startTurn() {
+      // Elenmiş oyuncuları atla
+      while (eliminatedPlayers.includes(activePlayer)) {
+        activePlayer = (activePlayer % 4) + 1;
+      }
+
+      if (activePlayer === 1 && !isSpectator) {
+        updateStatus("Sizin Turunuz: Bir Bölge Seçin!");
+        startTimer();
+      } else {
+        updateStatus(`${activePlayer}. Bot Düşünüyor...`);
+        clearInterval(timer);
+        setTimeout(botMove, 1200);
+      }
     }
 
     function startTimer() {
@@ -114,98 +180,94 @@
         timeLeft--;
         document.getElementById('time-left').innerText = timeLeft;
         if (timeLeft <= 0) {
-          autoSelect();
+          clearInterval(timer);
+          autoMove();
         }
       }, 1000);
     }
 
-    // Seçim yapılmazsa 10 sn sonunda rastgele atama
-    function autoSelect() {
-      let emptyRegions = Object.keys(regions).filter(id => regions[id].owner === null);
-      if (emptyRegions.length > 0) {
-        let randomId = emptyRegions[Math.floor(Math.random() * emptyRegions.length)];
-        handleRegionClick(parseInt(randomId));
+    function autoMove() {
+      if (phase === "SELECT") {
+        let empties = Object.keys(regions).filter(i => regions[i].owner === null);
+        if (empties.length > 0) handleRegionClick(parseInt(empties[0]));
+      } else {
+        let enemies = Object.keys(regions).filter(i => regions[i].owner !== activePlayer);
+        if (enemies.length > 0) handleRegionClick(parseInt(enemies[0]));
       }
     }
 
     function handleRegionClick(regId) {
-      if (regions[regId].owner !== null && phase !== "BATTLE") return;
+      if (activePlayer !== 1 && !isSpectator) return;
+      if (regions[regId].owner !== null && phase === "SELECT") return;
 
-      if (phase === "CASTLE") {
-        // Kale Kurulumu (1000 Puan)
-        regions[regId] = { owner: activePlayer, points: 1000, isCastle: true };
-        scores[activePlayer] += 1000;
-        updateRegionUI(regId);
+      clearInterval(timer);
 
-        activePlayer++;
-        if (activePlayer > 4) {
-          activePlayer = 1;
-          phase = "SELECT";
-          updateStatus("BÖLGE PAYLAŞIMI: 1. Oyuncu Bölge Seçiyor");
-        } else {
-          updateStatus(`KALE SEÇİMİ: ${activePlayer}. Oyuncu Kalesini Seçsin`);
-        }
-        startTimer();
-
-      } else if (phase === "SELECT") {
-        // Normal Bölge Seçimi (200 Puan)
+      if (phase === "SELECT") {
+        // Bölge Paylaşımı (200 Puan)
         regions[regId] = { owner: activePlayer, points: 200, isCastle: false };
         scores[activePlayer] += 200;
         updateRegionUI(regId);
 
-        let emptyLeft = Object.keys(regions).some(id => regions[id].owner === null);
+        let emptyLeft = Object.keys(regions).some(i => regions[i].owner === null);
         if (!emptyLeft) {
           phase = "BATTLE";
           activePlayer = 1;
-          clearInterval(timer);
-          updateStatus("SAVAŞ EVRESİ: Saldırılacak Rakip Bölgeyi Seçin");
+          alert("Tüm Bölgeler Paylaşıldı! Savaş Evresi Başlıyor.");
         } else {
           activePlayer = (activePlayer % 4) + 1;
-          updateStatus(`BÖLGE PAYLAŞIMI: ${activePlayer}. Oyuncu Bölge Seçiyor`);
-          startTimer();
         }
+        renderScores();
+        startTurn();
 
       } else if (phase === "BATTLE") {
-        // Saldırı Mekaniği
-        if (regions[regId].owner === activePlayer) return; // Kendi bölgesine saldıramaz
-        currentTargetRegion = regId;
-        openQuestionModal();
+        if (regions[regId].owner === activePlayer) return;
+        currentTargetReg = regId;
+        openCategoryModal();
       }
-      
-      renderScores();
     }
 
-    function openQuestionModal() {
-      clearInterval(timer);
-      const q = questions[Math.floor(Math.random() * questions.length)];
-      document.getElementById('modal-title').innerText = `${activePlayer}. Oyuncu Saldırıyor!`;
-      document.getElementById('modal-desc').innerText = q.q;
-      
-      const optsDiv = document.getElementById('modal-options');
-      optsDiv.innerHTML = '';
-
-      q.opts.forEach((opt, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'btn-opt';
-        btn.innerText = opt;
-        btn.onclick = () => processBattle(idx === q.a);
-        optsDiv.appendChild(btn);
-      });
-
+    // 1. Kategori Seçim Penceresi
+    function openCategoryModal() {
+      const modal = document.getElementById('modal-content');
+      modal.innerHTML = `
+        <h3>Kategori Seçin</h3>
+        <p style="margin:8px 0; font-size:13px; color:#94a3b8;">Hangi kategoriden soru yanıtlamak istersiniz?</p>
+        <div class="grid-btns">
+          <button class="btn-action btn-cat" onclick="selectQuestion('tarih')">📜 Tarih</button>
+          <button class="btn-action btn-cat" onclick="selectQuestion('cografya')">🌍 Coğrafya</button>
+          <button class="btn-action btn-cat" onclick="selectQuestion('spor')">⚽ Spor</button>
+          <button class="btn-action btn-cat" onclick="selectQuestion('muzik')">🎵 Müzik</button>
+        </div>
+        <button class="btn-action btn-cat" style="margin-top:8px;" onclick="selectQuestion('genel')">🧠 Genel Kültür</button>
+      `;
       document.getElementById('modal-overlay').style.display = 'flex';
     }
 
-    function processBattle(isCorrect) {
+    // 2. Soru Gösterimi
+    function selectQuestion(cat) {
+      const qList = questionBank[cat];
+      const q = qList[Math.floor(Math.random() * qList.length)];
+      
+      const modal = document.getElementById('modal-content');
+      let html = `<h3>${q.q}</h3><div style="margin-top:12px;">`;
+      q.opts.forEach((opt, idx) => {
+        html += `<button class="btn-action" onclick="resolveBattle(${idx === q.a})">${opt}</button>`;
+      });
+      html += `</div>`;
+      modal.innerHTML = html;
+    }
+
+    function resolveBattle(isCorrect) {
       document.getElementById('modal-overlay').style.display = 'none';
-      let target = regions[currentTargetRegion];
+      let target = regions[currentTargetReg];
       let defender = target.owner;
 
       if (isCorrect) {
-        alert("Saldırı Başarılı! Bölge Ele Geçirildi.");
-        
+        alert("Doğru Cevap! Bölge Fethettiniz.");
+
         if (target.isCastle) {
-          // KALE YOK EDİLDİ: Tüm puanlar ve bölgeler fetheden oyuncuya geçer!
-          alert(`🏰 ${defender}. OYUNCUNUN KALESİ YIKILDI! Tüm bölgeleri ${activePlayer}. oyuncuya geçti!`);
+          // KALE YIKILDI! Tüm mülkiyetler geçer ve oyuncu elenir.
+          alert(`🏰 ${defender}. OYUNCUNUN KALESİ YIKILDI! Tüm bölgeleri fethettiniz!`);
           
           Object.keys(regions).forEach(rId => {
             if (regions[rId].owner === defender) {
@@ -216,26 +278,108 @@
 
           scores[activePlayer] += scores[defender];
           scores[defender] = 0;
+          eliminatePlayer(defender);
         } else {
-          // Normal Bölge Fethi
           scores[defender] -= target.points;
           scores[activePlayer] += target.points;
           target.owner = activePlayer;
-          updateRegionUI(currentTargetRegion);
+          updateRegionUI(currentTargetReg);
         }
       } else {
         alert("Yanlış Cevap! Saldırı Başarısız.");
       }
 
-      activePlayer = (activePlayer % 4) + 1;
       renderScores();
-      updateStatus(`SAVAŞ EVRESİ: ${activePlayer}. Oyuncu Saldıracak Bölge Seçiyor`);
+      activePlayer = (activePlayer % 4) + 1;
+      startTurn();
+    }
+
+    // Bot Yapay Zeka Hamleleri
+    function botMove() {
+      if (phase === "SELECT") {
+        let empties = Object.keys(regions).filter(i => regions[i].owner === null);
+        if (empties.length > 0) {
+          let choice = empties[Math.floor(Math.random() * empties.length)];
+          regions[choice] = { owner: activePlayer, points: 200, isCastle: false };
+          scores[activePlayer] += 200;
+          updateRegionUI(choice);
+
+          let emptyLeft = Object.keys(regions).some(i => regions[i].owner === null);
+          if (!emptyLeft) {
+            phase = "BATTLE";
+            activePlayer = 1;
+            alert("Tüm Bölgeler Paylaşıldı! Savaş Evresi Başlıyor.");
+          } else {
+            activePlayer = (activePlayer % 4) + 1;
+          }
+          renderScores();
+          startTurn();
+        }
+      } else if (phase === "BATTLE") {
+        let enemies = Object.keys(regions).filter(i => regions[i].owner !== activePlayer);
+        if (enemies.length > 0) {
+          let targetId = enemies[Math.floor(Math.random() * enemies.length)];
+          let botSuccess = Math.random() > 0.4; // %60 başarı oranı
+
+          let target = regions[targetId];
+          let defender = target.owner;
+
+          if (botSuccess) {
+            if (target.isCastle) {
+              alert(`🏰 ${activePlayer}. Bot, ${defender}. Oyuncunun Kalesini Yıktı!`);
+              Object.keys(regions).forEach(rId => {
+                if (regions[rId].owner === defender) {
+                  regions[rId].owner = activePlayer;
+                  updateRegionUI(rId);
+                }
+              });
+              scores[activePlayer] += scores[defender];
+              scores[defender] = 0;
+              eliminatePlayer(defender);
+            } else {
+              scores[defender] -= target.points;
+              scores[activePlayer] += target.points;
+              target.owner = activePlayer;
+              updateRegionUI(targetId);
+            }
+          }
+
+          renderScores();
+          activePlayer = (activePlayer % 4) + 1;
+          startTurn();
+        }
+      }
+    }
+
+    // Oyuncunun Elenmesi
+    function eliminatePlayer(pId) {
+      eliminatedPlayers.push(pId);
+      document.getElementById(`p${pId}`).classList.add('eliminated');
+
+      if (pId === 1 && !isSpectator) {
+        showEliminatedModal();
+      }
+    }
+
+    function showEliminatedModal() {
+      const modal = document.getElementById('modal-content');
+      modal.innerHTML = `
+        <h2 style="color:#ef4444;">Kaleniz Yıkıldı ve Elendiniz!</h2>
+        <p style="margin:12px 0;">Oyunu izlemeye devam edebilir veya çıkıp yeniden başlatabilirsiniz.</p>
+        <button class="btn-action" onclick="enableSpectatorMode()">👁️ Oyunu İzle</button>
+        <button class="btn-action btn-danger" onclick="location.reload()">🚪 Çık / Yeniden Başlat</button>
+      `;
+      document.getElementById('modal-overlay').style.display = 'flex';
+    }
+
+    function enableSpectatorMode() {
+      isSpectator = true;
+      document.getElementById('modal-overlay').style.display = 'none';
+      startTurn();
     }
 
     function updateRegionUI(regId) {
-      const regObj = regions[regId];
-      const el = document.getElementById(`reg-${regId}`);
-      el.setAttribute('fill', colors[regObj.owner]);
+      document.getElementById(`reg-${regId}`).setAttribute('fill', colors[regions[regId].owner]);
     }
 
     function renderScores() {
